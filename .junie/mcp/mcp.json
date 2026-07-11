@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "C:\\Users\\Komputer Sekolah.DESKTOP-9I7GL9A\\.config\\herd\\bin\\php84\\php.exe",
+            "args": [
+                "C:\\Users\\Komputer Sekolah.DESKTOP-9I7GL9A\\Herd\\inventaris_new\\artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}
