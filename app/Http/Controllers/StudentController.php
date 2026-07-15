@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\StudentExport;
+use App\Helpers\QRCodeHelper;
 use App\Imports\StudentsImport;
 use App\Models\Classlevel;
 use App\Models\Major;
@@ -178,6 +179,7 @@ class StudentController extends Controller
 
         $qrcode = new QRCode($options);
         $png = $qrcode->render($student->barcode);
+        $png = QRCodeHelper::renderWithLabel($png, $student->name);
 
         return response($png, 200, [
             'Content-Type' => 'image/png',
@@ -206,6 +208,7 @@ class StudentController extends Controller
         foreach ($students as $student) {
             $qrcode = new QRCode($options);
             $pngData = $qrcode->render($student->barcode);
+            $pngData = QRCodeHelper::renderWithLabel($pngData, $student->name);
             $zip->addFromString($student->name.'-'.$student->nis.'.png', $pngData);
         }
 

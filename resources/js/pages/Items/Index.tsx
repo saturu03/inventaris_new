@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Ellipsis, Eye, SquarePen, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -35,6 +35,52 @@ import { index, create, edit, destroy } from '@/routes/items';
 import barcode from '@/routes/items/barcode';
 import type { BreadcrumbItem, Item } from '@/types';
 
+function Lightbox({ item, onClose }: { item: Item | null; onClose: () => void }) {
+    useEffect(() => {
+        if (!item) return;
+        const handleKey = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
+        document.addEventListener('keydown', handleKey);
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.removeEventListener('keydown', handleKey);
+            document.body.style.overflow = '';
+        };
+    }, [item, onClose]);
+
+    if (!item) return null;
+
+    return (
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm"
+            onClick={onClose}
+        >
+            <div
+                className="relative max-h-[90vh] max-w-[90vw] overflow-hidden rounded-2xl bg-white p-2 shadow-2xl dark:bg-gray-900"
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button
+                    onClick={onClose}
+                    className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M18 6 6 18" /><path d="m6 6 12 12" />
+                    </svg>
+                </button>
+                <img
+                    src={'/storage/' + item.photo}
+                    alt={item.name}
+                    className="max-h-[80vh] w-auto max-w-full rounded-lg object-contain"
+                />
+                <p className="mt-2 text-center text-sm font-medium text-gray-900 dark:text-white">
+                    {item.name}
+                </p>
+            </div>
+        </div>
+    );
+}
+
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Manage Items',
@@ -46,6 +92,7 @@ export default function ItemsIndex({ items }: { items: Item[] }) {
     const [deleteItemId, setDeleteItemId] = useState(0);
     const [deleteItemName, setDeleteItemName] = useState('');
     const [showAlert, setShowAlert] = useState(false);
+    const [previewItem, setPreviewItem] = useState<Item | null>(null);
 
     const handleDelete = () => {
         router.delete(destroy(deleteItemId));
@@ -71,6 +118,7 @@ export default function ItemsIndex({ items }: { items: Item[] }) {
                     <TableHeader>
                         <TableRow>
                             <TableHead>#</TableHead>
+                            <TableHead>Photo</TableHead>
                             <TableHead>Name</TableHead>
                             <TableHead>Category - Location</TableHead>
                             <TableHead className="text-right">Action</TableHead>
@@ -80,6 +128,35 @@ export default function ItemsIndex({ items }: { items: Item[] }) {
                         {items.map((item, index) => (
                             <TableRow key={item.id}>
                                 <TableCell>{index + 1}</TableCell>
+                                <TableCell>
+                                    {item.photo ? (
+                                        <img
+                                            src={'/storage/' + item.photo}
+                                            alt={item.name}
+                                            className="h-12 w-12 cursor-pointer rounded-lg object-cover transition-transform hover:scale-110"
+                                            onClick={() => setPreviewItem(item)}
+                                        />
+                                    ) : (
+                                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-100 dark:bg-gray-800">
+                                            <svg
+                                                className="h-6 w-6 text-gray-400"
+                                                xmlns="http://www.w3.org/2000/svg"
+                                                width="24"
+                                                height="24"
+                                                viewBox="0 0 24 24"
+                                                fill="none"
+                                                stroke="currentColor"
+                                                strokeWidth="2"
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                            >
+                                                <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+                                                <circle cx="9" cy="9" r="2" />
+                                                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
+                                            </svg>
+                                        </div>
+                                    )}
+                                </TableCell>
                                 <TableCell>{item.name}</TableCell>
                                 <TableCell>
                                     {item.category.name} - {item.location.name}
@@ -168,6 +245,7 @@ export default function ItemsIndex({ items }: { items: Item[] }) {
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>
+            <Lightbox item={previewItem} onClose={() => setPreviewItem(null)} />
         </AppLayout>
     );
 }

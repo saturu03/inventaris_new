@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\QRCodeHelper;
 use App\Models\Category;
 use App\Models\Item;
 use App\Models\Location;
@@ -170,6 +171,7 @@ class ItemController extends Controller
 
         $qrcode = new QRCode($options);
         $png = $qrcode->render($item->barcode);
+        $png = QRCodeHelper::renderWithLabel($png, $item->name);
 
         return response($png, 200, [
             'Content-Type' => 'image/png',
@@ -198,6 +200,7 @@ class ItemController extends Controller
         foreach ($items as $item) {
             $qrcode = new QRCode($options);
             $pngData = $qrcode->render($item->barcode);
+            $pngData = QRCodeHelper::renderWithLabel($pngData, $item->name);
             $zip->addFromString($item->name.'-'.$item->id.'.png', $pngData);
         }
 
