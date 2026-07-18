@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Ellipsis, MapPin, SquarePen, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useLanguage } from '@/contexts/language-context';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -42,6 +43,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function LocationsIndex({ locations }: { locations: Location[] }) {
+    const { t } = useLanguage();
     const [deleteLocationId, setDeleteLocationId] = useState(0);
     const [deleteLocationName, setDeleteLocationName] = useState('');
     const [showAlert, setShowAlert] = useState(false);
@@ -56,18 +58,18 @@ export default function LocationsIndex({ locations }: { locations: Location[] })
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Locations Index" />
             <div className="flex h-full flex-col gap-4 overflow-x-auto p-4">
-                <h3 className="text-lg font-medium">Table Locations</h3>
+                <h3 className="text-lg font-medium">{`${t('table')} ${t('locations')}`}</h3>
                 <div className="flex flex-row gap-4 my-4">
                     <Link href={create()} className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium whitespace-nowrap text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
-                        Add location
+                        {t('addLocation')}
                     </Link>
                 </div>
                 <Table>
-                    <TableCaption>Table Locations</TableCaption>
+                    <TableCaption>{`${t('table')} ${t('locations')}`}</TableCaption>
                     <TableHeader>
                         <TableRow>
                             <TableHead>#</TableHead>
-                            <TableHead>Name</TableHead>
+                            <TableHead>{t('name')}</TableHead>
                             <TableHead className="text-right">Action</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -96,7 +98,7 @@ export default function LocationsIndex({ locations }: { locations: Location[] })
                                                             className="my-auto"
                                                             size={16}
                                                         />{' '}
-                                                        Edit
+                                                        {t('edit')}
                                                     </Link>
                                                 </DropdownMenuLabel>
                                             </DropdownMenuGroup>
@@ -118,7 +120,7 @@ export default function LocationsIndex({ locations }: { locations: Location[] })
                                                         className="my-auto"
                                                         size={16}
                                                     />{' '}
-                                                    Delete
+                                                    {t('delete')}
                                                 </DropdownMenuItem>
                                             </DropdownMenuGroup>
                                         </DropdownMenuContent>
@@ -133,19 +135,19 @@ export default function LocationsIndex({ locations }: { locations: Location[] })
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            Are you sure want to delete {deleteLocationName}?
+                            {t('areYouSureDelete', { name: deleteLocationName })}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone.
+                            {t('thisActionCannotUndone')}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                             variant="destructive"
                             onClick={handleDelete}
                         >
-                            Delete
+                            {t('delete')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

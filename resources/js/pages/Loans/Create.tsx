@@ -3,6 +3,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle, Plus, Scan, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import YudielScanner from '@/components/yudiel-scanner';
+import { useLanguage } from '@/contexts/language-context';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,15 +25,6 @@ import { byBarcode as studentByBarcode } from '@/routes/students';
 import { byBarcode as itemByBarcode } from '@/routes/items';
 import type { BreadcrumbItem, Item, Student, LoanForm } from '@/types';
 
-const roleOptions = [
-    { value: 'student', label: 'Student' },
-    { value: 'teacher', label: 'Teacher' },
-    { value: 'staff', label: 'Staff' },
-    { value: 'external', label: 'External' },
-    { value: 'tukang', label: 'Tukang' },
-    { value: 'other', label: 'Other...' },
-] as const;
-
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Manage Loans',
@@ -51,7 +43,17 @@ export default function LoanCreate({
     items: Item[];
     students: Student[];
 }) {
+    const { t } = useLanguage();
     const [isCustomRole, setIsCustomRole] = useState(false);
+
+    const roleOptions = [
+        { value: 'student', label: t('student') },
+        { value: 'teacher', label: t('teacher') },
+        { value: 'staff', label: t('staffRole') },
+        { value: 'external', label: t('external') },
+        { value: 'tukang', label: t('tukang') },
+        { value: 'other', label: t('other') },
+    ] as const;
     const [scanningStudent, setScanningStudent] = useState<number | null>(null);
     const [scanningItem, setScanningItem] = useState<number | null>(null);
     const [scanError, setScanError] = useState<string | null>(null);
@@ -79,6 +81,20 @@ export default function LoanCreate({
             setData('borrower_date', getCurrentDateTimeLocal());
         }
     }, []);
+
+    useEffect(() => {
+        if (!data.borrower_date) return;
+
+        if (data.borrower_role === 'student') {
+            // Student: otomatis jam 17:00 hari yang sama
+            const borrowDate = new Date(data.borrower_date);
+            const returnDate = new Date(borrowDate);
+            returnDate.setHours(17, 0, 0, 0);
+            returnDate.setMinutes(returnDate.getMinutes() - returnDate.getTimezoneOffset());
+            setData('estimated_return_date', returnDate.toISOString().slice(0, 16));
+        }
+        // Non-stisan: tidak otomatis, user bisa isi sendiri
+    }, [data.borrower_date, data.borrower_role]);
 
     const getCurrentDateTimeLocal = () => {
         const now = new Date();
@@ -116,7 +132,7 @@ export default function LoanCreate({
         try {
             const res = await fetch(studentByBarcode.url({ barcode }));
             if (!res.ok) {
-                setScanError('Siswa dengan barcode tersebut tidak ditemukan.');
+                setScanError(t('studentNotFound'));
                 return;
             }
             const student: Student = await res.json();
@@ -125,7 +141,7 @@ export default function LoanCreate({
             updated[entryIndex].borrower_name = student.name;
             setData('entries', updated);
         } catch {
-            setScanError('Gagal memuat data siswa. Periksa koneksi Anda.');
+            setScanError(t('studentLoadFailed'));
         } finally {
             setScanningStudent(null);
         }
@@ -137,7 +153,7 @@ export default function LoanCreate({
         try {
             const res = await fetch(itemByBarcode.url({ barcode }));
             if (!res.ok) {
-                setScanError('Barang dengan barcode tersebut tidak ditemukan.');
+                setScanError(t('itemNotFound'));
                 return;
             }
             const item: Item = await res.json();
@@ -147,7 +163,7 @@ export default function LoanCreate({
             }
             setData('entries', updated);
         } catch {
-            setScanError('Gagal memuat data barang. Periksa koneksi Anda.');
+            setScanError(t('itemLoadFailed'));
         } finally {
             setScanningItem(null);
         }
@@ -174,7 +190,7 @@ export default function LoanCreate({
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
                         <div className="space-y-2">
                             <Label className="block text-sm font-medium">
-                                Borrower Role
+                                {t('borrowerRole')}
                             </Label>
                             <Select
                                 value={isCustomRole ? 'other' : data.borrower_role}
@@ -187,16 +203,17 @@ export default function LoanCreate({
                                         setData('borrower_role', value);
                                         if (value !== 'student') {
                                             setData('entries', data.entries.map((e) => ({ ...e, student_id: null })));
+                                            setData('estimated_return_date', '');
                                         }
                                     }
                                 }}
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select role" />
+                                    <SelectValue placeholder={t('selectRole')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectLabel>Roles</SelectLabel>
+                                        <SelectLabel>{t('roles')}</SelectLabel>
                                         {roleOptions.map((role) => (
                                             <SelectItem key={role.value} value={role.value}>
                                                 {role.label}
@@ -208,7 +225,7 @@ export default function LoanCreate({
                             {isCustomRole && (
                                 <Input
                                     type="text"
-                                    placeholder="Type custom role..."
+                                    placeholder={t('typeCustomRole')}
                                     value={data.borrower_role}
                                     onChange={(e) => setData('borrower_role', e.target.value)}
                                     className="mt-2"
@@ -225,7 +242,7 @@ export default function LoanCreate({
                                 htmlFor="collateral_type"
                                 className="block text-sm font-medium"
                             >
-                                Collateral Type
+                                {t('collateralType')}
                             </Label>
                             <Input
                                 type="text"
@@ -248,7 +265,7 @@ export default function LoanCreate({
                             htmlFor="borrower_date"
                             className="block text-sm font-medium"
                         >
-                            Borrow Date
+                            {t('borrowDate')}
                         </Label>
                         <Input
                             type="datetime-local"
@@ -271,17 +288,22 @@ export default function LoanCreate({
                             htmlFor="estimated_return_date"
                             className="block text-sm font-medium"
                         >
-                            Estimasi Kembali
+                            {t('estimatedReturn')}
                         </Label>
                         <Input
                             type="datetime-local"
                             name="estimated_return_date"
                             id="estimated_return_date"
                             value={data.estimated_return_date}
-                            onChange={(e) =>
-                                setData('estimated_return_date', e.target.value)
-                            }
+                            readOnly={data.borrower_role === 'student'}
+                            className={data.borrower_role === 'student' ? 'bg-muted cursor-not-allowed' : ''}
+                            onChange={(e) => setData('estimated_return_date', e.target.value)}
                         />
+                        <p className="text-xs text-muted-foreground">
+                            {data.borrower_role === 'student'
+                                ? t('estimatedReturnHelperStudent')
+                                : t('estimatedReturnHelper')}
+                        </p>
                         <InputError
                             className="mt-2"
                             message={errors.estimated_return_date}
@@ -294,7 +316,7 @@ export default function LoanCreate({
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
                             <Label className="text-sm font-medium">
-                                Borrowers
+                                {t('borrowers')}
                             </Label>
                             <div className="flex gap-2">
                                 <Button
@@ -304,7 +326,7 @@ export default function LoanCreate({
                                     onClick={addEntry}
                                 >
                                     <Plus className="mr-1 size-4" />
-                                    Add Borrower
+                                    {t('addBorrower')}
                                 </Button>
                             </div>
                         </div>
@@ -318,7 +340,7 @@ export default function LoanCreate({
                                     {data.borrower_role === 'student' && (
                                         <div className="flex-1 space-y-2">
                                             <Label className="block text-sm font-medium">
-                                                Student
+                                                {t('student')}
                                             </Label>
                                             <Select
                                                 value={
@@ -334,12 +356,12 @@ export default function LoanCreate({
                                                 }
                                             >
                                                 <SelectTrigger className="w-full">
-                                                    <SelectValue placeholder="Select student" />
+                                                    <SelectValue placeholder={t('selectStudent')} />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     <SelectGroup>
                                                         <SelectLabel>
-                                                            Students
+                                                            {t('students')}
                                                         </SelectLabel>
                                                         {students.map(
                                                             (student) => (
@@ -365,11 +387,11 @@ export default function LoanCreate({
                                     )}
 
                                     <div className="flex-1 space-y-2">
-                                        <Label
-                                            htmlFor={`borrower_name_${entryIndex}`}
-                                            className="block text-sm font-medium"
-                                        >
-                                            Borrower Name
+                                            <Label
+                                                htmlFor={`borrower_name_${entryIndex}`}
+                                                className="block text-sm font-medium"
+                                            >
+                                                {t('borrowerName')}
                                         </Label>
                                         <Input
                                             type="text"
@@ -406,7 +428,7 @@ export default function LoanCreate({
 
                                 <div className="space-y-2">
                                     <Label className="block text-sm font-medium">
-                                        Items
+                                        {t('items')}
                                     </Label>
                                     <MultiSelect
                                         options={items.map((item) => ({
@@ -420,8 +442,8 @@ export default function LoanCreate({
                                             updated[entryIndex].item_ids = selected;
                                             setData('entries', updated);
                                         }}
-                                        placeholder="Select items"
-                                        emptyMessage="No items available."
+                                        placeholder={t('selectItems')}
+                                        emptyMessage={t('noItemsAvailable')}
                                     />
                                     <InputError
                                         className="mt-2"
@@ -430,18 +452,18 @@ export default function LoanCreate({
                                     <div className="flex gap-2 mt-2">
                                         <YudielScanner
                                             onScan={(barcode) => handleStudentScan(barcode, entryIndex)}
-                                            triggerLabel={scanningStudent === entryIndex ? <><LoaderCircle className="mr-1 size-4 animate-spin" /> Mencari...</> : <><Scan className="mr-1 size-4" /> Scan Siswa</>}
-                                            title="Scan Barcode Siswa"
-                                            description="Arahkan kamera ke barcode kartu siswa."
+                                            triggerLabel={scanningStudent === entryIndex ? <><LoaderCircle className="mr-1 size-4 animate-spin" /> {t('searching')}</> : <><Scan className="mr-1 size-4" /> {t('scanStudent')}</>}
+                                            title={t('scanStudentBarcode')}
+                                            description={t('scanStudentDesc')}
                                             variant="outline"
                                             size="sm"
                                             disabled={scanningStudent === entryIndex}
                                         />
                                         <YudielScanner
                                             onScan={(barcode) => handleItemScan(barcode, entryIndex)}
-                                            triggerLabel={scanningItem === entryIndex ? <><LoaderCircle className="mr-1 size-4 animate-spin" /> Mencari...</> : <><Scan className="mr-1 size-4" /> Scan Barang</>}
-                                            title="Scan Barcode Barang"
-                                            description="Arahkan kamera ke barcode barang."
+                                            triggerLabel={scanningItem === entryIndex ? <><LoaderCircle className="mr-1 size-4 animate-spin" /> {t('searching')}</> : <><Scan className="mr-1 size-4" /> {t('scanItem')}</>}
+                                            title={t('scanItemBarcode')}
+                                            description={t('scanItemDesc')}
                                             variant="outline"
                                             size="sm"
                                             disabled={scanningItem === entryIndex}

@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Ellipsis, SquarePen, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useLanguage } from '@/contexts/language-context';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -39,6 +40,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function ClasslevelsIndex({ classes }: { classes: Classlevel[] }) {
+    const { t } = useLanguage();
     const [deleteId, setDeleteId] = useState(0);
     const [deleteName, setDeleteName] = useState('');
     const [showAlert, setShowAlert] = useState(false);
@@ -53,18 +55,18 @@ export default function ClasslevelsIndex({ classes }: { classes: Classlevel[] })
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Classes Index" />
             <div className="flex h-full flex-col gap-4 overflow-x-auto p-4">
-                <h3 className="text-lg font-medium">Table Classes</h3>
+                <h3 className="text-lg font-medium">{`${t('table')} ${t('classes')}`}</h3>
                 <div className="flex flex-row gap-4 my-4">
                     <Link href={create()} className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium whitespace-nowrap text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
-                        Add class
+                        {t('addClass')}
                     </Link>
                 </div>
                 <Table>
-                    <TableCaption>Table Classes</TableCaption>
+                    <TableCaption>{`${t('table')} ${t('classes')}`}</TableCaption>
                     <TableHeader>
                         <TableRow>
                             <TableHead>#</TableHead>
-                            <TableHead>Level</TableHead>
+                            <TableHead>{t('level')}</TableHead>
                             <TableHead className="text-right">Action</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -84,7 +86,7 @@ export default function ClasslevelsIndex({ classes }: { classes: Classlevel[] })
                                             <DropdownMenuGroup>
                                                 <DropdownMenuLabel>
                                                     <Link href={edit(cls.id)} className="flex gap-4">
-                                                        <SquarePen className="my-auto" size={16} /> Edit
+                                                         <SquarePen className="my-auto" size={16} /> {t('edit')}
                                                     </Link>
                                                 </DropdownMenuLabel>
                                             </DropdownMenuGroup>
@@ -95,7 +97,7 @@ export default function ClasslevelsIndex({ classes }: { classes: Classlevel[] })
                                                     setDeleteName('Class ' + cls.level);
                                                     setShowAlert(true);
                                                 }}>
-                                                    <Trash2 className="my-auto" size={16} /> Delete
+                                                     <Trash2 className="my-auto" size={16} /> {t('delete')}
                                                 </DropdownMenuItem>
                                             </DropdownMenuGroup>
                                         </DropdownMenuContent>
@@ -109,12 +111,12 @@ export default function ClasslevelsIndex({ classes }: { classes: Classlevel[] })
             <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure want to delete {deleteName}?</AlertDialogTitle>
-                        <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+                        <AlertDialogTitle>{t('areYouSureDelete', { name: deleteName })}</AlertDialogTitle>
+                        <AlertDialogDescription>{t('thisActionCannotUndone')}</AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
-                        <AlertDialogAction variant="destructive" onClick={handleDelete}>Delete</AlertDialogAction>
+                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                        <AlertDialogAction variant="destructive" onClick={handleDelete}>{t('delete')}</AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>
             </AlertDialog>

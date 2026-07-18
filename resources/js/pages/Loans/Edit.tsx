@@ -5,6 +5,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useLanguage } from '@/contexts/language-context';
 import {
     Select,
     SelectContent,
@@ -19,15 +20,6 @@ import AppLayout from '@/layouts/app-layout';
 import { index, edit, update } from '@/routes/loans';
 import type { BreadcrumbItem, Item, Student, Loan, LoanForm } from '@/types';
 
-const roleOptions = [
-    { value: 'student', label: 'Student' },
-    { value: 'teacher', label: 'Teacher' },
-    { value: 'staff', label: 'Staff' },
-    { value: 'external', label: 'External' },
-    { value: 'tukang', label: 'Tukang' },
-    { value: 'other', label: 'Other...' },
-] as const;
-
 export default function LoanEdit({
     loan,
     items,
@@ -37,6 +29,15 @@ export default function LoanEdit({
     items: Item[];
     students: Student[];
 }) {
+    const { t } = useLanguage();
+    const roleOptions = [
+        { value: 'student', label: t('student') },
+        { value: 'teacher', label: t('teacher') },
+        { value: 'staff', label: t('staffRole') },
+        { value: 'external', label: t('external') },
+        { value: 'tukang', label: t('tukang') },
+        { value: 'other', label: t('other') },
+    ] as const;
     const predefinedRole = roleOptions.find((r) => r.value === loan.borrower_role);
     const [isCustomRole, setIsCustomRole] = useState(!predefinedRole);
 
@@ -92,7 +93,7 @@ export default function LoanEdit({
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                             <Label className="block text-sm font-medium">
-                                Item
+                                {t('items')}
                             </Label>
                             <Select
                                 value={
@@ -105,11 +106,11 @@ export default function LoanEdit({
                                 }
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select item" />
+                                    <SelectValue placeholder={t('selectItem')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectLabel>Items</SelectLabel>
+                                        <SelectLabel>{t('items')}</SelectLabel>
                                         {items.map((item) => (
                                             <SelectItem
                                                 value={item.id.toString()}
@@ -129,7 +130,7 @@ export default function LoanEdit({
 
                         <div className="space-y-2">
                             <Label className="block text-sm font-medium">
-                                Borrower Name
+                                {t('borrowerName')}
                             </Label>
                             <Input
                                 type="text"
@@ -151,7 +152,7 @@ export default function LoanEdit({
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                             <Label className="block text-sm font-medium">
-                                Borrower Role
+                                {t('borrowerRole')}
                             </Label>
                             <Select
                                 value={isCustomRole ? 'other' : data.borrower_role}
@@ -169,11 +170,11 @@ export default function LoanEdit({
                                 }}
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select role" />
+                                    <SelectValue placeholder={t('selectRole')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectLabel>Roles</SelectLabel>
+                                        <SelectLabel>{t('roles')}</SelectLabel>
                                         {roleOptions.map((role) => (
                                             <SelectItem key={role.value} value={role.value}>
                                                 {role.label}
@@ -185,7 +186,7 @@ export default function LoanEdit({
                             {isCustomRole && (
                                 <Input
                                     type="text"
-                                    placeholder="Type custom role..."
+                                    placeholder={t('typeCustomRole')}
                                     value={data.borrower_role}
                                     onChange={(e) => setData('borrower_role', e.target.value)}
                                     className="mt-2"
@@ -199,9 +200,9 @@ export default function LoanEdit({
 
                         {data.borrower_role === 'student' && (
                             <div className="space-y-2">
-                                <Label className="block text-sm font-medium">
-                                    Student
-                                </Label>
+                                    <Label className="block text-sm font-medium">
+                                        {t('student')}
+                                    </Label>
                                 <Select
                                     value={
                                         data.student_id
@@ -213,11 +214,11 @@ export default function LoanEdit({
                                     }
                                 >
                                     <SelectTrigger className="w-full">
-                                        <SelectValue placeholder="Select student (optional)" />
+                                        <SelectValue placeholder={t('selectStudentOptional')} />
                                     </SelectTrigger>
                                     <SelectContent>
                                         <SelectGroup>
-                                            <SelectLabel>Students</SelectLabel>
+                                            <SelectLabel>{t('students')}</SelectLabel>
                                             {students.map((student) => (
                                                 <SelectItem
                                                     value={student.id.toString()}
@@ -243,7 +244,7 @@ export default function LoanEdit({
                                 htmlFor="collateral_type"
                                 className="block text-sm font-medium"
                             >
-                                Collateral Type
+                                {t('collateralType')}
                             </Label>
                             <Input
                                 type="text"
@@ -266,7 +267,7 @@ export default function LoanEdit({
                             htmlFor="borrower_date"
                             className="block text-sm font-medium"
                         >
-                            Borrow Date
+                            {t('borrowDate')}
                         </Label>
                         <Input
                             type="datetime-local"
@@ -289,7 +290,7 @@ export default function LoanEdit({
                             htmlFor="estimated_return_date"
                             className="block text-sm font-medium"
                         >
-                            Estimasi Kembali
+                            {t('estimatedReturn')}
                         </Label>
                         <Input
                             type="datetime-local"

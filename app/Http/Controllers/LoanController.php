@@ -121,6 +121,20 @@ class LoanController extends Controller
             'estimated_return_date' => 'nullable|date',
         ]);
 
+        // Auto-calculate estimated_return_date based on borrower_role
+        $borrowerRole = $request->borrower_role;
+        $borrowerCarbon = Carbon::parse($request->borrower_date);
+
+        if ($borrowerRole === 'student') {
+            // Student: deadline jam 17:00 hari yang sama
+            $estimatedReturn = $borrowerCarbon->copy()->setTime(17, 0, 0);
+        } else {
+            // Non-student: gunakan input dari user (bebas)
+            $estimatedReturn = $request->estimated_return_date
+                ? Carbon::parse($request->estimated_return_date)
+                : $borrowerCarbon->copy()->addDays(3);
+        }
+
         $allItemIds = collect($request->entries)->pluck('item_ids')->flatten()->unique();
         $inavailable = Item::whereIn('id', $allItemIds)->where('status', '!=', 'available')->pluck('id');
 
@@ -146,7 +160,7 @@ class LoanController extends Controller
                     'borrower_role' => $request->borrower_role,
                     'collateral_type' => $request->collateral_type,
                     'borrower_date' => $request->borrower_date,
-                    'estimated_return_date' => $request->estimated_return_date ?: null,
+                    'estimated_return_date' => $estimatedReturn->format('Y-m-d H:i:s'),
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
@@ -254,14 +268,26 @@ class LoanController extends Controller
             ->whereDate('estimated_return_date', '<', now()->format('Y-m-d'))
             ->get();
 
-        $homeroomTeachers = HomeroomTeacher::all()->keyBy('major');
+        $homeroomTeachers = HomeroomTeacher::with(['major', 'class'])->get();
 
-        $grouped = $overdueLoans->groupBy(fn ($loan) => $loan->student?->major?->alias ?? 'Lainnya');
+        $grouped = $overdueLoans->groupBy(function ($loan) {
+            $majorAlias = $loan->student?->major?->alias ?? 'Lainnya';
+            $classLevel = $loan->student?->class?->level ?? '';
 
-        $sections = $grouped->mapWithKeys(function ($loans, $major) use ($homeroomTeachers) {
-            $teacher = $homeroomTeachers->get($major) ?? $homeroomTeachers->first(fn ($t) => str_starts_with($major, $t->major));
+            return $majorAlias.'|'.$classLevel;
+        });
 
-            return [$major => [
+        $sections = $grouped->mapWithKeys(function ($loans, $key) use ($homeroomTeachers) {
+            [$major, $classLevel] = explode('|', $key);
+            $label = $major.' Kelas '.$classLevel;
+
+            $teacher = $homeroomTeachers->first(
+                fn ($t) => $t->major?->alias === $major && $t->class?->level === $classLevel
+            );
+
+            return [$label => [
+                'major' => $major,
+                'classLevel' => $classLevel,
                 'homeroomTeacher' => $teacher,
                 'loans' => $loans,
             ]];

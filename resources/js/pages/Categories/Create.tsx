@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { index, create, store } from '@/routes/categories';
+import { useLanguage } from '@/contexts/language-context';
 import type { BreadcrumbItem, CategoryForm } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -15,6 +16,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function CategoryCreate() {
+    const { t } = useLanguage();
     const { data, setData, post, errors, reset, processing, recentlySuccessful } =
         useForm<CategoryForm>({ name: '' });
 
@@ -27,18 +29,18 @@ export default function CategoryCreate() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Add a new Category" />
             <div className="flex h-full flex-col gap-4 overflow-x-auto p-4">
-                <h3 className="text-lg font-medium">Add a new Category</h3>
+                <h3 className="text-lg font-medium">{t('addCategoryTitle')}</h3>
                 <Separator />
                 <form onSubmit={handleSubmit} method="post" className="space-y-6">
                     <div className="space-y-2">
-                        <Label htmlFor="name" className="block text-sm font-medium">Name</Label>
+                        <Label htmlFor="name" className="block text-sm font-medium">{t('name')}</Label>
                         <Input type="text" id="name" required value={data.name} onChange={(e) => setData('name', e.target.value)} />
                         <InputError className="mt-2" message={errors.name} />
                     </div>
                     <div className="flex items-center gap-4">
-                        <Button type="submit" disabled={processing}>Add</Button>
+                        <Button type="submit" disabled={processing}>{t('add')}</Button>
                         <Transition show={recentlySuccessful} enter="transition ease-in-out" enterFrom="opacity-0" leave="transition ease-in-out" leaveTo="opacity-0">
-                            <p className="text-sm text-green-600">Added.</p>
+                            <p className="text-sm text-green-600">{t('added')}</p>
                         </Transition>
                     </div>
                 </form>

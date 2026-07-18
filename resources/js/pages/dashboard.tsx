@@ -6,6 +6,7 @@ import { index as itemsIndex } from '@/routes/items';
 import { index as loansIndex } from '@/routes/loans';
 import { index as depositsIndex } from '@/routes/deposits';
 import { index as studentsIndex } from '@/routes/students';
+import { useLanguage } from '@/contexts/language-context';
 import type { BreadcrumbItem } from '@/types';
 
 type StatCard = {
@@ -71,51 +72,53 @@ export default function Dashboard({
     stats: DashboardStats;
     recentLoans: RecentLoan[];
 }) {
+    const { t } = useLanguage();
+
     const cards: StatCard[] = [
     {
-        title: 'Total Barang',
+        title: t('totalItems'),
         value: stats.items.total,
         icon: Package,
         href: itemsIndex().url,
         color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
     },
     {
-        title: 'Tersedia',
+        title: t('available'),
         value: stats.items.available,
         icon: Package,
         href: itemsIndex().url,
         color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
     },
     {
-        title: 'Dipinjam',
+        title: t('borrowed'),
         value: stats.items.borrowed,
         icon: Package,
         href: loansIndex().url,
         color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400',
     },
     {
-        title: 'Peminjaman Aktif',
+        title: t('activeLoans'),
         value: stats.loans.active,
         icon: ArrowLeftRight,
         href: loansIndex().url,
         color: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
     },
     {
-        title: 'Overdue',
+        title: t('overdue'),
         value: stats.loans.overdue,
         icon: Clock,
         href: loansIndex().url,
         color: 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400',
     },
     {
-        title: 'Titipan Aktif',
+        title: t('activeDeposits'),
         value: stats.deposits.active,
         icon: Inbox,
         href: depositsIndex().url,
         color: 'bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
     },
     {
-        title: 'Total Siswa',
+        title: t('totalStudents'),
         value: stats.students,
         icon: Users,
         href: studentsIndex().url,
@@ -132,7 +135,7 @@ export default function Dashboard({
                         Overview
                     </h2>
                     <p className="mt-0.5 text-sm text-gray-500 dark:text-gray-400">
-                        Ringkasan data inventaris sekolah
+                        {t('overviewSubtitle')}
                     </p>
                 </div>
 
@@ -145,7 +148,7 @@ export default function Dashboard({
                 <div className="grid gap-6 lg:grid-cols-2">
                     <div className="rounded-xl border border-sidebar-border/70 bg-white p-5 dark:bg-sidebar-accent/10">
                         <h3 className="mb-4 text-base font-semibold text-gray-900 dark:text-white">
-                            Peminjaman Terbaru
+                            {t('recentLoans')}
                         </h3>
                         {recentLoans.length > 0 ? (
                             <div className="overflow-x-auto">
@@ -153,16 +156,16 @@ export default function Dashboard({
                                     <thead>
                                         <tr className="border-b border-gray-200 dark:border-gray-700">
                                             <th className="pb-2 text-left font-medium text-gray-500 dark:text-gray-400">
-                                                Barang
+                                                {t('items')}
                                             </th>
                                             <th className="pb-2 text-left font-medium text-gray-500 dark:text-gray-400">
-                                                Peminjam
+                                                {t('borrower')}
                                             </th>
                                             <th className="pb-2 text-left font-medium text-gray-500 dark:text-gray-400">
-                                                Tanggal
+                                                {t('date')}
                                             </th>
                                             <th className="pb-2 text-right font-medium text-gray-500 dark:text-gray-400">
-                                                Status
+                                                {t('status')}
                                             </th>
                                         </tr>
                                     </thead>
@@ -184,7 +187,7 @@ export default function Dashboard({
                                                 <td className="py-2.5 text-right">
                                                     {loan.returned ? (
                                                         <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-400/10 dark:text-emerald-400 dark:ring-emerald-400/20">
-                                                            Kembali
+                                                            {t('returnedStatus')}
                                                         </span>
                                                     ) : loan.is_overdue ? (
                                                         <span className="inline-flex items-center rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700 ring-1 ring-red-600/20 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20">
@@ -203,19 +206,19 @@ export default function Dashboard({
                             </div>
                         ) : (
                             <p className="py-6 text-center text-sm text-gray-400 dark:text-gray-600">
-                                Belum ada peminjaman
+                                {t('noLoansYet')}
                             </p>
                         )}
                     </div>
 
                     <div className="rounded-xl border border-sidebar-border/70 bg-white p-5 dark:bg-sidebar-accent/10">
                         <h3 className="mb-4 text-base font-semibold text-gray-900 dark:text-white">
-                            Ringkasan Cepat
+                            {t('quickSummary')}
                         </h3>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
                                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                                    Barang tersedia
+                                    {t('itemsAvailable')}
                                 </span>
                                 <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
                                     {stats.items.available} / {stats.items.total}
@@ -223,7 +226,7 @@ export default function Dashboard({
                             </div>
                             <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
                                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                                    Peminjaman aktif
+                                    {t('activeLoansCount')}
                                 </span>
                                 <span className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">
                                     {stats.loans.active}
@@ -231,7 +234,7 @@ export default function Dashboard({
                             </div>
                             <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
                                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                                    Peminjaman overdue
+                                    {t('overdueLoans')}
                                 </span>
                                 <span className="text-sm font-semibold text-red-600 dark:text-red-400">
                                     {stats.loans.overdue}
@@ -239,7 +242,7 @@ export default function Dashboard({
                             </div>
                             <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
                                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                                    Titipan aktif
+                                    {t('activeDepositsCount')}
                                 </span>
                                 <span className="text-sm font-semibold text-purple-600 dark:text-purple-400">
                                     {stats.deposits.active}
@@ -247,7 +250,7 @@ export default function Dashboard({
                             </div>
                             <div className="flex items-center justify-between rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
                                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                                    Total siswa
+                                    {t('totalStudentsCount')}
                                 </span>
                                 <span className="text-sm font-semibold text-cyan-600 dark:text-cyan-400">
                                     {stats.students}

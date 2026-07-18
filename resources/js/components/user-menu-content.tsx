@@ -7,6 +7,7 @@ import {
     DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { UserInfo } from '@/components/user-info';
+import { useLanguage } from '@/contexts/language-context';
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
@@ -17,6 +18,7 @@ type Props = {
 };
 
 export function UserMenuContent({ user }: Props) {
+    const { t } = useLanguage();
     const cleanup = useMobileNavigation();
 
     const handleLogout = () => {
@@ -41,7 +43,7 @@ export function UserMenuContent({ user }: Props) {
                         onClick={cleanup}
                     >
                         <Settings className="mr-2" />
-                        Settings
+                        {t('settings')}
                     </Link>
                 </DropdownMenuItem>
             </DropdownMenuGroup>

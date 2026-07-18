@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { index, create, store } from '@/routes/majors';
+import { useLanguage } from '@/contexts/language-context';
 import type { BreadcrumbItem, MajorForm } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -15,6 +16,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function MajorCreate() {
+    const { t } = useLanguage();
     const { data, setData, post, errors, reset, processing, recentlySuccessful } =
         useForm<MajorForm>({ full_name: '', alias: '' });
 
@@ -27,25 +29,25 @@ export default function MajorCreate() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Add a new Major" />
             <div className="flex h-full flex-col gap-4 overflow-x-auto p-4">
-                <h3 className="text-lg font-medium">Add a new Major</h3>
+                <h3 className="text-lg font-medium">{t('addMajorTitle')}</h3>
                 <Separator />
                 <form onSubmit={handleSubmit} method="post" className="space-y-6">
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
-                            <Label htmlFor="full_name" className="block text-sm font-medium">Full Name</Label>
+                            <Label htmlFor="full_name" className="block text-sm font-medium">{t('fullName')}</Label>
                             <Input type="text" id="full_name" required value={data.full_name} onChange={(e) => setData('full_name', e.target.value)} />
                             <InputError className="mt-2" message={errors.full_name} />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="alias" className="block text-sm font-medium">Alias</Label>
+                            <Label htmlFor="alias" className="block text-sm font-medium">{t('alias')}</Label>
                             <Input type="text" id="alias" required maxLength={4} value={data.alias} onChange={(e) => setData('alias', e.target.value)} />
                             <InputError className="mt-2" message={errors.alias} />
                         </div>
                     </div>
                     <div className="flex items-center gap-4">
-                        <Button type="submit" disabled={processing}>Add</Button>
+                        <Button type="submit" disabled={processing}>{t('add')}</Button>
                         <Transition show={recentlySuccessful} enter="transition ease-in-out" enterFrom="opacity-0" leave="transition ease-in-out" leaveTo="opacity-0">
-                            <p className="text-sm text-green-600">Added.</p>
+                            <p className="text-sm text-green-600">{t('added')}</p>
                         </Transition>
                     </div>
                 </form>

@@ -1,6 +1,7 @@
 import { Head, router } from '@inertiajs/react';
 import { CheckCircle, ChevronDown, ChevronRight, Ellipsis, FileText, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useLanguage } from '@/contexts/language-context';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -41,10 +42,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const periods = [
-    { label: 'Day', value: 'day' },
-    { label: 'Week', value: 'week' },
-    { label: 'Month', value: 'month' },
-    { label: 'Year', value: 'year' },
+    { key: 'day', value: 'day' },
+    { key: 'week', value: 'week' },
+    { key: 'month', value: 'month' },
+    { key: 'year', value: 'year' },
 ];
 
 export default function LoansReturned({
@@ -54,6 +55,7 @@ export default function LoansReturned({
     groups: { label: string; loans: Loan[] }[];
     period: string;
 }) {
+    const { t } = useLanguage();
     const [deleteLoanId, setDeleteLoanId] = useState(0);
     const [deleteLoanName, setDeleteLoanName] = useState('');
     const [showAlert, setShowAlert] = useState(false);
@@ -85,14 +87,14 @@ export default function LoansReturned({
                                 router.get(returned(), { period: p.value }, { preserveState: true, preserveScroll: true })
                             }
                         >
-                            {p.label}
+                            {t(p.key)}
                         </Button>
                     ))}
                     </div>
                     <a href={pdf.url({ period })} target="_blank">
                         <Button type="button" variant="outline" size="sm">
                             <FileText className="mr-1 size-4" />
-                            Download PDF
+                            {t('downloadPdf')}
                         </Button>
                     </a>
                 </div>
@@ -100,7 +102,7 @@ export default function LoansReturned({
                 {groups.length === 0 && (
                     <div className="flex flex-col items-center gap-2 py-12 text-center text-muted-foreground">
                         <CheckCircle className="h-8 w-8 text-green-500" />
-                        No returned loans yet.
+                        {t('noReturnedLoans')}
                     </div>
                 )}
 
@@ -126,16 +128,16 @@ export default function LoansReturned({
                                     <Table>
                                         <TableHeader>
                                             <TableRow>
-                                                <TableHead>#</TableHead>
-                                                <TableHead>Item</TableHead>
-                                                <TableHead>Dipinjamkan oleh</TableHead>
-                                                <TableHead>Borrower</TableHead>
-                                                <TableHead>Borrow Date</TableHead>
-                                                <TableHead>Estimasi Kembali</TableHead>
-                                                <TableHead>Durasi</TableHead>
-                                                <TableHead>Returned</TableHead>
-                                                <TableHead>Diterima oleh</TableHead>
-                                                <TableHead className="text-right">Action</TableHead>
+                                                <TableHead>{t('name')}</TableHead>
+                                                <TableHead>{t('items')}</TableHead>
+                                                <TableHead>{t('lentBy')}</TableHead>
+                                                <TableHead>{t('borrower')}</TableHead>
+                                                <TableHead>{t('borrowDate')}</TableHead>
+                                                <TableHead>{t('estimatedReturn')}</TableHead>
+                                                <TableHead>{t('duration')}</TableHead>
+                                                <TableHead>{t('returnedStatus')}</TableHead>
+                                                <TableHead>{t('receivedBy')}</TableHead>
+                                                <TableHead className="text-right">{t('action')}</TableHead>
                                             </TableRow>
                                         </TableHeader>
                                         <TableBody>
@@ -155,7 +157,7 @@ export default function LoansReturned({
                                                             const to = loan.returned ? new Date(loan.returned) : new Date();
                                                             const diffMs = to.getTime() - from.getTime();
                                                             const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-                                                            return `${diffDays} hari`;
+                                                            return t('days', { n: diffDays });
                                                         })()}
                                                     </TableCell>
                                                     <TableCell>
@@ -186,7 +188,7 @@ export default function LoansReturned({
                                                                         }}
                                                                     >
                                                                         <Trash2 className="my-auto" size={16} />{' '}
-                                                                        Delete
+                                                                        {t('delete')}
                                                                     </DropdownMenuItem>
                                                                 </DropdownMenuGroup>
                                                             </DropdownMenuContent>
@@ -206,16 +208,16 @@ export default function LoansReturned({
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            Are you sure want to delete loan from {deleteLoanName}?
+                            {t('areYouSureDelete', { name: deleteLoanName })}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
+                            {t('deleteDialogDesc')}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                         <AlertDialogAction variant="destructive" onClick={handleDelete}>
-                            Delete
+                            {t('delete')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

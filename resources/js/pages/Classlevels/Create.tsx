@@ -7,6 +7,7 @@ import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { index, create, store } from '@/routes/classlevels';
+import { useLanguage } from '@/contexts/language-context';
 import type { BreadcrumbItem, ClasslevelForm } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -15,6 +16,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function ClasslevelCreate() {
+    const { t } = useLanguage();
     const { data, setData, post, errors, reset, processing, recentlySuccessful } =
         useForm<ClasslevelForm>({ level: 10 });
 
@@ -27,33 +29,33 @@ export default function ClasslevelCreate() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Add a new Class" />
             <div className="flex h-full flex-col gap-4 overflow-x-auto p-4">
-                <h3 className="text-lg font-medium">Add a new Class</h3>
+                <h3 className="text-lg font-medium">{t('addClassTitle')}</h3>
                 <Separator />
                 <form onSubmit={handleSubmit} method="post" className="space-y-6">
                     <div className="space-y-2">
-                        <Label className="block text-sm font-medium">Level</Label>
+                        <Label className="block text-sm font-medium">{t('level')}</Label>
                         <Select
                             value={data.level.toString()}
                             onValueChange={(value) => setData('level', Number(value))}
                         >
                             <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select level" />
+                                <SelectValue placeholder={t('selectLevel')} />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectGroup>
-                                    <SelectLabel>Levels</SelectLabel>
-                                    <SelectItem value="10">Class 10</SelectItem>
-                                    <SelectItem value="11">Class 11</SelectItem>
-                                    <SelectItem value="12">Class 12</SelectItem>
+                                    <SelectLabel>{t('levels')}</SelectLabel>
+                                    <SelectItem value="10">{t('class10')}</SelectItem>
+                                    <SelectItem value="11">{t('class11')}</SelectItem>
+                                    <SelectItem value="12">{t('class12')}</SelectItem>
                                 </SelectGroup>
                             </SelectContent>
                         </Select>
                         <InputError className="mt-2" message={errors.level} />
                     </div>
                     <div className="flex items-center gap-4">
-                        <Button type="submit" disabled={processing}>Add</Button>
+                        <Button type="submit" disabled={processing}>{t('add')}</Button>
                         <Transition show={recentlySuccessful} enter="transition ease-in-out" enterFrom="opacity-0" leave="transition ease-in-out" leaveTo="opacity-0">
-                            <p className="text-sm text-green-600">Added.</p>
+                            <p className="text-sm text-green-600">{t('added')}</p>
                         </Transition>
                     </div>
                 </form>

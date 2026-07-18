@@ -1,15 +1,15 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { home, login } from '@/routes';
-import itemsRoute from '@/routes/items';
+import { useLanguage } from '@/contexts/language-context';
 import type { Item, LocationWithItems } from '@/types';
 
-function statusIndicator(status: Item['status']) {
+function statusIndicator(status: Item['status'], t: (key: string) => string) {
     if (status === 'available') {
         return (
             <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700 ring-1 ring-emerald-600/20 dark:bg-emerald-400/10 dark:text-emerald-400 dark:ring-emerald-400/20">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
-                Tersedia
+                {t('available')}
             </span>
         );
     }
@@ -17,15 +17,15 @@ function statusIndicator(status: Item['status']) {
     return (
         <span className="inline-flex items-center gap-1 rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-700 ring-1 ring-red-600/20 dark:bg-red-400/10 dark:text-red-400 dark:ring-red-400/20">
             <span className="h-1.5 w-1.5 rounded-full bg-red-600 dark:bg-red-400" />
-            Dipinjam
+            {t('borrowed')}
         </span>
     );
 }
 
-function conditionLabel(condition: Item['condition']) {
-    if (condition === 'functional') return 'Baik';
-    if (condition === 'slightly_damaged') return 'Rusak Ringan';
-    return 'Rusak';
+function conditionLabel(condition: Item['condition'], t: (key: string) => string) {
+    if (condition === 'functional') return t('functional');
+    if (condition === 'slightly_damaged') return t('slightlyDamaged');
+    return t('broken');
 }
 
 function Lightbox({ item, onClose }: { item: Item | null; onClose: () => void }) {
@@ -75,6 +75,7 @@ function Lightbox({ item, onClose }: { item: Item | null; onClose: () => void })
 }
 
 export default function ItemsPublic({ locations }: { locations: LocationWithItems[] }) {
+    const { t } = useLanguage();
     const [selectedLocationId, setSelectedLocationId] = useState<number | null>(
         locations.length > 0 ? locations[0].id : null,
     );
@@ -113,27 +114,22 @@ export default function ItemsPublic({ locations }: { locations: LocationWithItem
 
     return (
         <>
-            <Head title="Cek Status Barang" />
+            <Head title={t('checkItemStatus')} />
 
             <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-gray-950">
                 <header className="sticky top-0 z-10 border-b border-gray-200 bg-white/80 backdrop-blur-md dark:border-gray-800 dark:bg-gray-900/80">
                     <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-                        <Link href={home()} className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
+                        <Link href={home()} className="flex items-center gap-2 text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
+                            <img src="/apple-touch-icon.png" alt="Logo" className="h-7 w-7 object-contain" />
                             Inventra School
                         </Link>
 
                         <nav className="flex items-center gap-3">
                             <Link
-                                href={itemsRoute.public().url}
-                                className="text-sm font-medium text-indigo-600 underline underline-offset-4 dark:text-indigo-400"
-                            >
-                                Cek Barang
-                            </Link>
-                            <Link
                                 href={login()}
                                 className="inline-flex h-8 items-center justify-center rounded-md bg-gray-900 px-3 text-sm font-medium text-white transition-colors hover:bg-gray-800 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200"
                             >
-                                Staff Login
+                                {t('staffLogin')}
                             </Link>
                         </nav>
                     </div>
@@ -142,10 +138,10 @@ export default function ItemsPublic({ locations }: { locations: LocationWithItem
                 <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6">
                     <div className="mb-8">
                         <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white sm:text-3xl">
-                            Cek Status Barang
+                            {t('checkItemStatus')}
                         </h1>
                         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            Pilih lokasi untuk melihat barang yang tersedia.
+                            {t('selectLocationSubtitle')}
                         </p>
                     </div>
 
@@ -155,9 +151,9 @@ export default function ItemsPublic({ locations }: { locations: LocationWithItem
                             onChange={(e) => setStatusFilter(e.target.value as 'all' | 'available' | 'inavailable')}
                             className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
                         >
-                            <option value="all">Semua ({allItems.length})</option>
-                            <option value="available">Tersedia ({availableCount})</option>
-                            <option value="inavailable">Dipinjam ({borrowedCount})</option>
+                            <option value="all">{`${t('all')} (${allItems.length})`}</option>
+                            <option value="available">{`${t('available')} (${availableCount})`}</option>
+                            <option value="inavailable">{`${t('borrowed')} (${borrowedCount})`}</option>
                         </select>
                     </div>
 
@@ -166,7 +162,7 @@ export default function ItemsPublic({ locations }: { locations: LocationWithItem
                             <div className="relative">
                                 <input
                                     type="text"
-                                    placeholder="Cari barang..."
+                                    placeholder={t('searchItems')}
                                     value={search}
                                     onChange={(e) => setSearch(e.target.value)}
                                     className="w-full rounded-lg border border-gray-200 bg-white px-4 py-2 pl-10 text-sm text-gray-900 placeholder-gray-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white dark:placeholder-gray-500"
@@ -232,7 +228,7 @@ export default function ItemsPublic({ locations }: { locations: LocationWithItem
                                                 onKeyDown={(e) => {
                                                     if (e.key === 'Enter' && item.photo) setPreviewItem(item);
                                                 }}
-                                                aria-label={`Lihat foto ${item.name}`}
+                                                aria-label={t('viewPhoto', { name: item.name })}
                                             >
                                                 {item.photo ? (
                                                     <img
@@ -266,11 +262,11 @@ export default function ItemsPublic({ locations }: { locations: LocationWithItem
                                             </span>
 
                                             <span className="absolute bottom-1 left-2.5 text-xs text-gray-500 dark:text-gray-400">
-                                                {conditionLabel(item.condition)}
+                                                {conditionLabel(item.condition, t)}
                                             </span>
 
                                             <div className="absolute right-2 top-2">
-                                                {statusIndicator(item.status)}
+                                                {statusIndicator(item.status, t)}
                                             </div>
                                         </div>
                                     ))}
@@ -297,7 +293,7 @@ export default function ItemsPublic({ locations }: { locations: LocationWithItem
                                 <path d="M7.5 4.27l9 5.15" />
                             </svg>
                             <p className="text-sm text-gray-500 dark:text-gray-400">
-                                Tidak ada barang
+                                {t('noItems')}
                             </p>
                         </div>
                     )}
@@ -305,7 +301,7 @@ export default function ItemsPublic({ locations }: { locations: LocationWithItem
 
                 <footer className="border-t border-gray-200 dark:border-gray-800">
                     <div className="mx-auto max-w-7xl px-4 py-4 text-center text-xs text-gray-400 dark:text-gray-600 sm:px-6">
-                        Inventra School Inventory System
+                        {t('inventorySystem')}
                     </div>
                 </footer>
             </div>

@@ -2,6 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Bell, CheckCheck, Clock } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/contexts/language-context';
 import {
     Table,
     TableBody,
@@ -49,6 +50,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function NotificationsIndex({ notifications }: { notifications: PaginatedData<NotificationItem> }) {
     const [markingAll, setMarkingAll] = useState(false);
+    const { t } = useLanguage();
 
     const handleMarkAllAsRead = () => {
         setMarkingAll(true);
@@ -80,24 +82,24 @@ export default function NotificationsIndex({ notifications }: { notifications: P
                     <h3 className="text-lg font-medium">Notifications</h3>
                     <Button variant="outline" size="sm" onClick={handleMarkAllAsRead} disabled={markingAll}>
                         <CheckCheck className="mr-2 h-4 w-4" />
-                        Mark All as Read
+                        {t('markAllRead')}
                     </Button>
                 </div>
                 <Table>
-                    <TableCaption>Total {notifications.total} notifications</TableCaption>
+                    <TableCaption>{t('totalNotifications', { n: notifications.total })}</TableCaption>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Message</TableHead>
-                            <TableHead>Date</TableHead>
-                            <TableHead>Action</TableHead>
+                            <TableHead>{t('status')}</TableHead>
+                            <TableHead>{t('message')}</TableHead>
+                            <TableHead>{t('date')}</TableHead>
+                            <TableHead>{t('action')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {notifications.data.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                                    No notifications
+                                    {t('noNotifications')}
                                 </TableCell>
                             </TableRow>
                         ) : (
@@ -115,7 +117,7 @@ export default function NotificationsIndex({ notifications }: { notifications: P
                                         <p className="text-sm text-muted-foreground">{notification.data.message}</p>
                                         {notification.data.days_overdue && (
                                             <p className="mt-1 text-xs text-red-500">
-                                                {notification.data.days_overdue} day(s) overdue
+                                                {t('daysOverdue', { n: notification.data.days_overdue })}
                                             </p>
                                         )}
                                     </TableCell>
@@ -128,7 +130,7 @@ export default function NotificationsIndex({ notifications }: { notifications: P
                                     <TableCell>
                                         {!notification.read_at && (
                                             <Button variant="ghost" size="sm" onClick={() => handleMarkAsRead(notification.id)}>
-                                                Mark Read
+                                                {t('markRead')}
                                             </Button>
                                         )}
                                     </TableCell>

@@ -14,6 +14,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
+import { useLanguage } from '@/contexts/language-context';
 import { dashboard } from '@/routes';
 import { index as studentsIndex } from '@/routes/students';
 import { index as itemsIndex } from '@/routes/items';
@@ -28,70 +29,6 @@ import { index as homeroomTeachersIndex } from '@/routes/homeroom-teachers';
 import { overdueLetter as loansOverdueLetter } from '@/routes/loans';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import type { NavItem } from '@/types';
-
-const menuItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-];
-
-const masterDataItems: NavItem[] = [
-    {
-        title: 'Manage Category',
-        href: categoriesIndex(),
-        icon: Tags,
-    },
-
-    {
-        title: 'Manage Major',
-        href: majorsIndex(),
-        icon: BookOpen,
-    },
-    {
-        title: 'Manage Location',
-        href: locationsIndex(),
-        icon: MapPin,
-    },
-    {
-        title: 'Manage Students',
-        href: studentsIndex(),
-        icon: Users,
-    },
-    {
-        title: 'Manage Items',
-        href: itemsIndex(),
-        icon: Package,
-    },
-];
-
-const transactionItems: NavItem[] = [
-    {
-        title: 'Manage Loans',
-        href: loansIndex(),
-        icon: ArrowLeftRight,
-    },
-    {
-        title: 'Returned',
-        href: loansReturned(),
-        icon: Trash2,
-    },
-    {
-        title: 'Surat Panggilan',
-        href: loansOverdueLetter().url,
-        icon: Mail,
-        external: true,
-    },
-];
-
-const depositItems: NavItem[] = [
-    {
-        title: 'Manage Deposits',
-        href: depositsIndex(),
-        icon: Inbox,
-    },
-];
 
 function NavGroup({ label, items }: { label: string; items: NavItem[] }) {
     const { isCurrentUrl } = useCurrentUrl();
@@ -130,7 +67,39 @@ function NavGroup({ label, items }: { label: string; items: NavItem[] }) {
 
 export function AppSidebar() {
     const { auth } = usePage().props;
+    const { t } = useLanguage();
     const isProktor = auth.user?.role === 'proktor';
+
+    const menuItems: NavItem[] = [
+        { title: t('dashboard'), href: dashboard(), icon: LayoutGrid },
+    ];
+
+    const staffMasterDataItems: NavItem[] = [
+        { title: t('manageStudents'), href: studentsIndex(), icon: Users },
+        { title: t('manageItems'), href: itemsIndex(), icon: Package },
+    ];
+
+    const proktorMasterDataItems: NavItem[] = [
+        { title: t('manageCategory'), href: categoriesIndex(), icon: Tags },
+        { title: t('manageMajor'), href: majorsIndex(), icon: BookOpen },
+        { title: t('manageLocation'), href: locationsIndex(), icon: MapPin },
+        ...staffMasterDataItems,
+    ];
+
+    const transactionItems: NavItem[] = [
+        { title: t('manageLoans'), href: loansIndex(), icon: ArrowLeftRight },
+        { title: t('returned'), href: loansReturned(), icon: Trash2 },
+        { title: t('overdueLetter'), href: loansOverdueLetter().url, icon: Mail, external: true },
+    ];
+
+    const depositItems: NavItem[] = [
+        { title: t('manageDeposits'), href: depositsIndex(), icon: Inbox },
+    ];
+
+    const adminItems: NavItem[] = [
+        { title: t('manageUsers'), href: usersIndex(), icon: Shield },
+        { title: t('homeroomTeachers'), href: homeroomTeachersIndex(), icon: Phone },
+    ];
 
     return (
         <Sidebar collapsible="icon" variant="inset">
@@ -147,23 +116,12 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavGroup label="Menu" items={menuItems} />
-                <NavGroup label="Master Data" items={masterDataItems} />
-                <NavGroup label="Transaction" items={transactionItems} />
-                <NavGroup label="Deposit" items={depositItems} />
+                <NavGroup label={t('menu')} items={menuItems} />
+                <NavGroup label={t('masterData')} items={isProktor ? proktorMasterDataItems : staffMasterDataItems} />
+                <NavGroup label={t('transaction')} items={transactionItems} />
+                <NavGroup label={t('deposit')} items={depositItems} />
                 {isProktor && (
-                    <NavGroup label="Administration" items={[
-                        {
-                            title: 'Manage Users',
-                            href: usersIndex(),
-                            icon: Shield,
-                        },
-                        {
-                            title: 'Wali Kelas',
-                            href: homeroomTeachersIndex(),
-                            icon: Phone,
-                        },
-                    ]} />
+                    <NavGroup label={t('administration')} items={adminItems} />
                 )}
             </SidebarContent>
 

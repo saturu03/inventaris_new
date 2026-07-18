@@ -1,5 +1,6 @@
 import { Transition } from '@headlessui/react';
 import { Head, useForm } from '@inertiajs/react';
+import { useLanguage } from '@/contexts/language-context';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,6 +42,7 @@ export default function StudentCreate({
     majors: Major[];
     classes: Class[];
 }) {
+    const { t } = useLanguage();
     const {
         data,
         setData,
@@ -81,7 +83,7 @@ export default function StudentCreate({
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                             <Label className="block text-sm font-medium">
-                                Major
+                                {t('major')}
                             </Label>
                             <Select
                                 value={
@@ -94,11 +96,11 @@ export default function StudentCreate({
                                 }
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select major" />
+                                    <SelectValue placeholder={t('selectMajor')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectLabel>Majors</SelectLabel>
+                                        <SelectLabel>{t('majors')}</SelectLabel>
                                         {majors.map((major) => (
                                             <SelectItem
                                                 value={major.id.toString()}
@@ -119,7 +121,7 @@ export default function StudentCreate({
 
                         <div className="space-y-2">
                             <Label className="block text-sm font-medium">
-                                Class
+                                {t('class')}
                             </Label>
                             <Select
                                 value={
@@ -132,11 +134,11 @@ export default function StudentCreate({
                                 }
                             >
                                 <SelectTrigger className="w-full">
-                                    <SelectValue placeholder="Select class" />
+                                    <SelectValue placeholder={t('selectClass')} />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
-                                        <SelectLabel>Classes</SelectLabel>
+                                        <SelectLabel>{t('classes')}</SelectLabel>
                                         {classes.map((cls) => (
                                             <SelectItem
                                                 value={cls.id.toString()}
@@ -161,7 +163,7 @@ export default function StudentCreate({
                                 htmlFor="name"
                                 className="block text-sm font-medium"
                             >
-                                Name
+                                {t('name')}
                             </Label>
                             <Input
                                 type="text"
@@ -184,7 +186,7 @@ export default function StudentCreate({
                                 htmlFor="nis"
                                 className="block text-sm font-medium"
                             >
-                                NIS
+                                {t('nis')}
                             </Label>
                             <Input
                                 type="number"
@@ -206,7 +208,7 @@ export default function StudentCreate({
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                             <Label className="block text-sm font-medium">
-                                Gender
+                                {t('gender')}
                             </Label>
                             <RadioGroup
                                 value={data.gender}
@@ -220,7 +222,7 @@ export default function StudentCreate({
                                         value="male"
                                         id="gender-male"
                                     />
-                                    <Label htmlFor="gender-male">Male</Label>
+                                    <Label htmlFor="gender-male">{t('male')}</Label>
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <RadioGroupItem
@@ -228,7 +230,7 @@ export default function StudentCreate({
                                         id="gender-female"
                                     />
                                     <Label htmlFor="gender-female">
-                                        Female
+                                        {t('female')}
                                     </Label>
                                 </div>
                             </RadioGroup>
@@ -243,7 +245,7 @@ export default function StudentCreate({
                                 htmlFor="phone"
                                 className="block text-sm font-medium"
                             >
-                                Phone
+                                {t('phone')}
                             </Label>
                             <Input
                                 type="text"
@@ -267,7 +269,7 @@ export default function StudentCreate({
                                 htmlFor="address"
                                 className="block text-sm font-medium"
                             >
-                                Address
+                                {t('address')}
                             </Label>
                             <Textarea
                                 name="address"
@@ -289,7 +291,7 @@ export default function StudentCreate({
                                 htmlFor="photo"
                                 className="block text-sm font-medium"
                             >
-                                Photo
+                                {t('photo')}
                             </Label>
                             <Input
                                 type="file"
@@ -315,7 +317,7 @@ export default function StudentCreate({
 
                     <div className="flex items-center gap-4">
                         <Button type="submit" disabled={processing}>
-                            Add
+                            {t('add')}
                         </Button>
                         <Transition
                             show={recentlySuccessful}
@@ -324,7 +326,7 @@ export default function StudentCreate({
                             leave="transition ease-in-out"
                             leaveTo="opacity-0"
                         >
-                            <p className="text-sm text-green-600">Added.</p>
+                            <p className="text-sm text-green-600">{t('added')}</p>
                         </Transition>
                     </div>
                 </form>

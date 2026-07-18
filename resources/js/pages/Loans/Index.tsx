@@ -1,6 +1,6 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { ArrowLeftRight, ChevronDown, ChevronRight, Ellipsis, FileText, SquarePen, Trash2 } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { ArrowLeftRight, ChevronDown, ChevronRight, FileText, Plus, SquarePen, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -12,45 +12,43 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuGroup,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    TableHeader,
-} from '@/components/ui/table';
-import AppLayout from '@/layouts/app-layout';
 import { Badge } from '@/components/ui/badge';
+import AppLayout from '@/layouts/app-layout';
 import { index, create, edit, destroy, pdf, returnMethod } from '@/routes/loans';
+import { useLanguage } from '@/contexts/language-context';
 import type { BreadcrumbItem, Loan } from '@/types';
 
+function statusBadge(loan: Loan, t: (key: string, params?: Record<string, string | number>) => string) {
+    if (loan.returned || !loan.estimated_return_date) return null;
+
+    const now = new Date();
+    const est = new Date(loan.estimated_return_date);
+    const diffMs = est.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays < 0) return <Badge variant="destructive">{t('overdueDays', { n: Math.abs(diffDays) })}</Badge>;
+    if (diffDays <= 1) return <Badge variant="secondary">{t('urgentDays', { n: diffDays })}</Badge>;
+    return <Badge variant="default">{t('safeDays', { n: diffDays })}</Badge>;
+}
+
+function loanDuration(loan: Loan, t: (key: string, params?: Record<string, string | number>) => string) {
+    const from = new Date(loan.borrower_date);
+    const to = loan.returned ? new Date(loan.returned) : new Date();
+    const diffMs = to.getTime() - from.getTime();
+    const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+
+    if (loan.estimated_return_date && !loan.returned) {
+        const est = new Date(loan.estimated_return_date);
+        const estDiffMs = est.getTime() - from.getTime();
+        const estDays = Math.ceil(estDiffMs / (1000 * 60 * 60 * 24));
+        return t('dayOf', { n: diffDays, m: estDays });
+    }
+
+    return `${diffDays} days`;
+}
+
 const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Manage Loans',
-        href: index(),
-    },
-];
-
-const tabs = [
-    { label: 'All', value: 'all' },
-    { label: 'Borrowed', value: 'borrowed' },
-];
-
-const periods = [
-    { label: 'Day', value: 'day' },
-    { label: 'Week', value: 'week' },
-    { label: 'Month', value: 'month' },
-    { label: 'Year', value: 'year' },
+    { title: 'Manage Loans', href: index() },
 ];
 
 export default function LoansIndex({
@@ -67,40 +65,19 @@ export default function LoansIndex({
     const [showAlert, setShowAlert] = useState(false);
     const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
 
-    const loanStatus = useMemo(() => {
-        return (loan: Loan) => {
-            if (loan.returned || !loan.estimated_return_date) return null;
+    const { t } = useLanguage();
 
-            const now = new Date();
-            const est = new Date(loan.estimated_return_date);
-            const diffMs = est.getTime() - now.getTime();
-            const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    const tabs = [
+        { label: t('all'), value: 'all' },
+        { label: t('borrowed'), value: 'borrowed' },
+    ];
 
-            if (diffDays < 0) return { label: `Terlambat ${Math.abs(diffDays)} hari`, variant: 'destructive' as const };
-            if (diffDays === 0) return { label: 'H-0 (Segera)', variant: 'secondary' as const };
-            if (diffDays === 1) return { label: 'H-1 (Segera)', variant: 'secondary' as const };
-
-            return { label: `Aman (sisa ${diffDays} hari)`, variant: 'default' as const };
-        };
-    }, []);
-
-    const loanDuration = useMemo(() => {
-        return (loan: Loan) => {
-            const from = new Date(loan.borrower_date);
-            const to = loan.returned ? new Date(loan.returned) : new Date();
-            const diffMs = to.getTime() - from.getTime();
-            const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-
-            if (loan.estimated_return_date && !loan.returned) {
-                const est = new Date(loan.estimated_return_date);
-                const estDiffMs = est.getTime() - from.getTime();
-                const estDays = Math.ceil(estDiffMs / (1000 * 60 * 60 * 24));
-                return `Hari ke-${diffDays} dari ${estDays} hari`;
-            }
-
-            return `${diffDays} hari`;
-        };
-    }, []);
+    const periods = [
+        { label: t('day'), value: 'day' },
+        { label: t('week'), value: 'week' },
+        { label: t('month'), value: 'month' },
+        { label: t('year'), value: 'year' },
+    ];
 
     const handleDelete = () => {
         router.delete(destroy(deleteLoanId));
@@ -118,48 +95,53 @@ export default function LoansIndex({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Loans Index" />
+            <Head title="Manage Loans" />
             <div className="flex h-full flex-col gap-4 overflow-x-auto p-4">
-                <h3 className="text-lg font-medium">Table Loans</h3>
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex flex-wrap gap-2">
-                        {tabs.map((tab) => (
-                            <Button
-                                key={tab.value}
-                                variant={filter === tab.value ? 'default' : 'outline'}
-                                size="sm"
-                                onClick={() => router.get(index(), { filter: tab.value, period }, { preserveState: true, preserveScroll: true })}
-                            >
-                                {tab.label}
-                            </Button>
-                        ))}
-                        <span className="mx-1 text-muted-foreground">|</span>
-                        {periods.map((p) => (
-                            <Button
-                                key={p.value}
-                                variant={period === p.value ? 'secondary' : 'ghost'}
-                                size="sm"
-                                onClick={() => router.get(index(), { filter, period: p.value }, { preserveState: true, preserveScroll: true })}
-                            >
-                                {p.label}
-                            </Button>
-                        ))}
-                    </div>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                    <h3 className="text-lg font-medium">Manage Loans</h3>
                     <div className="flex gap-2">
                         <a href={pdf.url({ period })} target="_blank">
                             <Button type="button" variant="outline" size="sm">
                                 <FileText className="mr-1 size-4" />
-                                Download PDF
+                                PDF
                             </Button>
                         </a>
-                        <Link href={create()}>
-                            Add loan
+                        <Link
+                            href={create()}
+                            className="inline-flex h-9 items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
+                        >
+                            <Plus size={16} />
+                            Add Loan
                         </Link>
                     </div>
                 </div>
 
+                <div className="flex flex-wrap items-center gap-2">
+                    {tabs.map((tab) => (
+                        <Button
+                            key={tab.value}
+                            variant={filter === tab.value ? 'default' : 'outline'}
+                            size="sm"
+                            onClick={() => router.get(index(), { filter: tab.value, period }, { preserveState: true, preserveScroll: true })}
+                        >
+                            {tab.label}
+                        </Button>
+                    ))}
+                    <span className="mx-1 text-muted-foreground">|</span>
+                    {periods.map((p) => (
+                        <Button
+                            key={p.value}
+                            variant={period === p.value ? 'secondary' : 'ghost'}
+                            size="sm"
+                            onClick={() => router.get(index(), { filter, period: p.value }, { preserveState: true, preserveScroll: true })}
+                        >
+                            {p.label}
+                        </Button>
+                    ))}
+                </div>
+
                 {groups.length === 0 && (
-                    <div className="py-12 text-center text-muted-foreground">No loans found.</div>
+                    <div className="py-12 text-center text-muted-foreground">{t('noDataFound')}</div>
                 )}
 
                 {groups.map((group) => {
@@ -175,121 +157,103 @@ export default function LoansIndex({
                                 {isExpanded ? <ChevronDown className="size-4" /> : <ChevronRight className="size-4" />}
                                 {group.label}
                                 <span className="ml-auto text-xs font-normal text-muted-foreground">
-                                    {group.loans.length} loan{group.loans.length !== 1 ? 's' : ''}
+                                    {t('loanCount', { n: group.loans.length })}
                                 </span>
                             </button>
 
                             {isExpanded && (
-                                <div className="overflow-x-auto">
-                                    <Table>
-                                        <TableHeader>
-                                            <TableRow>
-                                                <TableHead>#</TableHead>
-                                                <TableHead>Item</TableHead>
-                                                <TableHead>Dipinjamkan oleh</TableHead>
-                                                <TableHead>Borrower</TableHead>
-                                                <TableHead>Borrow Date</TableHead>
-                                                <TableHead>Estimasi Kembali</TableHead>
-                                                <TableHead>Durasi</TableHead>
-                                                <TableHead>Status</TableHead>
-                                                <TableHead>Returned</TableHead>
-                                                <TableHead>Diterima oleh</TableHead>
-                                                <TableHead className="text-right">Action</TableHead>
-                                            </TableRow>
-                                        </TableHeader>
-                                        <TableBody>
-                                            {group.loans.map((loan, i) => (
-                                                <TableRow key={loan.id}>
-                                                    <TableCell>{i + 1}</TableCell>
-                                                    <TableCell>{loan.item.name}</TableCell>
-                                                    <TableCell>{loan.user_out?.name}</TableCell>
-                                                    <TableCell>{loan.borrower_name}</TableCell>
-                                                    <TableCell>{loan.borrower_date}</TableCell>
-                                                    <TableCell>
-                                                        {loan.estimated_return_date ?? '-'}
-                                                    </TableCell>
-                                                    <TableCell>{loanDuration(loan)}</TableCell>
-                                                    <TableCell>
-                                                        {(() => {
-                                                            const status = loanStatus(loan);
-                                                            if (!status) return '-';
-                                                            return <Badge variant={status.variant}>{status.label}</Badge>;
-                                                        })()}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {loan.returned ? loan.returned : '-'}
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        {loan.user_in?.name ?? '-'}
-                                                    </TableCell>
-                                                    <TableCell className="text-right">
-                                                        <DropdownMenu>
-                                                            <DropdownMenuTrigger asChild>
-                                                                <Button variant="outline">
-                                                                    <Ellipsis />
-                                                                </Button>
-                                                            </DropdownMenuTrigger>
-                                                            <DropdownMenuContent>
-                                                                <DropdownMenuGroup>
-                                                                    <DropdownMenuLabel>
-                                                                        <Link
-                                                                            href={edit(loan.id)}
-                                                                            className="flex gap-4"
-                                                                        >
-                                                                            <SquarePen className="my-auto" size={16} />{' '}
-                                                                            Edit
-                                                                        </Link>
-                                                                    </DropdownMenuLabel>
-                                                                    {!loan.returned && (
-                                                                        <DropdownMenuItem
-                                                                            onSelect={() => handleReturn(loan.id)}
-                                                                        >
-                                                                            <ArrowLeftRight className="my-auto" size={16} />{' '}
-                                                                            Return
-                                                                        </DropdownMenuItem>
-                                                                    )}
-                                                                </DropdownMenuGroup>
-                                                                <DropdownMenuSeparator />
-                                                                <DropdownMenuGroup>
-                                                                    <DropdownMenuItem
-                                                                        variant="destructive"
-                                                                        onSelect={() => {
-                                                                            setDeleteLoanId(loan.id);
-                                                                            setDeleteLoanName(loan.borrower_name);
-                                                                            setShowAlert(true);
-                                                                        }}
-                                                                    >
-                                                                        <Trash2 className="my-auto" size={16} />{' '}
-                                                                        Delete
-                                                                    </DropdownMenuItem>
-                                                                </DropdownMenuGroup>
-                                                            </DropdownMenuContent>
-                                                        </DropdownMenu>
-                                                    </TableCell>
-                                                </TableRow>
-                                            ))}
-                                        </TableBody>
-                                    </Table>
+                                <div className="grid gap-4 p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                                    {group.loans.map((loan) => (
+                                        <div key={loan.id} className="flex flex-col rounded-xl border bg-card p-4 shadow-sm transition-shadow hover:shadow-md">
+                                            <div className="mb-3 flex items-start justify-between">
+                                                <h5 className="text-base font-semibold text-card-foreground">
+                                                    {loan.item.name}
+                                                </h5>
+                                                {statusBadge(loan, t)}
+                                            </div>
+
+                                            <div className="mb-3 flex-1 space-y-1.5 text-sm text-muted-foreground">
+                                                <div className="flex justify-between">
+                                                    <span>{t('borrower')}</span>
+                                                    <span className="font-medium text-card-foreground">{loan.borrower_name}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>{t('lentBy')}</span>
+                                                    <span className="font-medium text-card-foreground">{loan.user_out?.name ?? '-'}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>{t('borrowDate')}</span>
+                                                    <span className="font-medium text-card-foreground">{loan.borrower_date}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>{t('estimatedReturn')}</span>
+                                                    <span className="font-medium text-card-foreground">{loan.estimated_return_date ?? '-'}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>{t('duration')}</span>
+                                                    <span className="font-medium text-card-foreground">{loanDuration(loan, t)}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>{t('returnedStatus')}</span>
+                                                    <span className="font-medium text-card-foreground">{loan.returned ?? '-'}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span>{t('receivedBy')}</span>
+                                                    <span className="font-medium text-card-foreground">{loan.user_in?.name ?? '-'}</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex gap-2 border-t pt-3">
+                                                <Link
+                                                    href={edit(loan.id)}
+                                                    className="inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-md bg-gray-100 text-sm font-medium text-gray-700 transition-colors hover:bg-indigo-100 hover:text-indigo-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-indigo-900 dark:hover:text-indigo-300"
+                                                >
+                                                    <SquarePen size={14} />
+                                                    {t('edit')}
+                                                </Link>
+                                                {!loan.returned && (
+                                                    <button
+                                                        onClick={() => handleReturn(loan.id)}
+                                                        className="inline-flex h-8 flex-1 items-center justify-center gap-1.5 rounded-md bg-gray-100 text-sm font-medium text-gray-700 transition-colors hover:bg-emerald-100 hover:text-emerald-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-emerald-900 dark:hover:text-emerald-300"
+                                                    >
+                                                        <ArrowLeftRight size={14} />
+                                                        {t('returnBtn')}
+                                                    </button>
+                                                )}
+                                                <button
+                                                    onClick={() => {
+                                                        setDeleteLoanId(loan.id);
+                                                        setDeleteLoanName(loan.borrower_name);
+                                                        setShowAlert(true);
+                                                    }}
+                                                    className="inline-flex h-8 items-center justify-center rounded-md bg-gray-100 px-2 text-gray-700 transition-colors hover:bg-red-100 hover:text-red-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-red-900 dark:hover:text-red-300"
+                                                >
+                                                    <Trash2 size={14} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             )}
                         </div>
                     );
                 })}
             </div>
+
             <AlertDialog open={showAlert} onOpenChange={setShowAlert}>
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            Are you sure want to delete loan from {deleteLoanName}?
+                            {t('areYouSureDelete', { name: deleteLoanName })}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
+                            {t('thisActionCannotUndone')}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                         <AlertDialogAction variant="destructive" onClick={handleDelete}>
-                            Delete
+                            {t('delete')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

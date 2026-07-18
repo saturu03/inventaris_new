@@ -2,6 +2,7 @@ import { Head, Link, router } from '@inertiajs/react';
 import { Ellipsis, Eye, FileUp, SquarePen, Trash2, Upload } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import type { ChangeEvent, DragEvent } from 'react';
+import { useLanguage } from '@/contexts/language-context';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -41,7 +42,7 @@ import {
     TableHeader,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { index, create, edit, destroy, download, upload } from '@/routes/students';
+import { index, create, edit, destroy, destroyAll, download, upload } from '@/routes/students';
 import barcode from '@/routes/students/barcode';
 import { SearchInput } from '@/components/search-input';
 import type { BreadcrumbItem, Student } from '@/types';
@@ -65,9 +66,11 @@ interface Filters {
 }
 
 export default function StudentsIndex({ students, classOptions, filters, search }: { students: Student[]; classOptions: ClassOption[]; filters: Filters; search?: string }) {
+    const { t } = useLanguage();
     const [deleteStudentId, setDeleteStudentId] = useState(0);
     const [deleteStudentName, setDeleteStudentName] = useState('');
     const [showAlert, setShowAlert] = useState(false);
+    const [showDeleteAllAlert, setShowDeleteAllAlert] = useState(false);
     const [showUploadDialog, setShowUploadDialog] = useState(false);
     const [isDraggingFile, setIsDraggingFile] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -78,6 +81,11 @@ export default function StudentsIndex({ students, classOptions, filters, search 
         router.delete(destroy(deleteStudentId));
         setDeleteStudentId(0);
         setDeleteStudentName('');
+    };
+
+    const handleDeleteAll = () => {
+        router.delete(destroyAll());
+        setShowDeleteAllAlert(false);
     };
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -140,21 +148,23 @@ export default function StudentsIndex({ students, classOptions, filters, search 
             <div className="flex h-full flex-col gap-4 overflow-x-auto p-4">
                 <h3 className="text-lg font-medium">Table Students</h3>
                 <div className="flex flex-row p-4 gap-4">
-                    <SearchInput route={index().url} currentSearch={search} placeholder="Cari nama atau NIS..." />
+                    <SearchInput route={index().url} currentSearch={search} placeholder={t('searchPlaceholder')} />
                     <Link href={create()} className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium whitespace-nowrap text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
-                        Add student
+                        {t('addStudent')}
                     </Link>
                     <a href={download.url()} className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium whitespace-nowrap text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50">
                         Download
                     </a>
+                    <Button variant="destructive" onClick={() => setShowDeleteAllAlert(true)}>
+                        {t('deleteAllStudents')}
+                    </Button>
                     <Dialog open={showUploadDialog} onOpenChange={setShowUploadDialog}>
                         <DialogTrigger className='inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium whitespace-nowrap text-primary-foreground shadow-sm transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50'>Upload</DialogTrigger>
                         <DialogContent>
                             <DialogHeader>
-                                <DialogTitle>Upload Student File</DialogTitle>
+                                <DialogTitle>{t('uploadStudentFile')}</DialogTitle>
                                 <DialogDescription>
-                                    Seret file ke area di bawah atau klik untuk memilih file.
-                                    Format yang didukung: .xlsx, .xls, .csv
+                                    {t('uploadStudentDesc')}
                                 </DialogDescription>
                             </DialogHeader>
                             <input
@@ -185,12 +195,12 @@ export default function StudentsIndex({ students, classOptions, filters, search 
                             >
                                 <Upload className="mb-3" size={24} />
                                 <p className="text-sm font-medium">
-                                    {selectedFile ? selectedFile.name : 'Drop file di sini'}
+                                    {selectedFile ? selectedFile.name : t('dropFileHere')}
                                 </p>
                                 <p className="mt-1 text-xs text-muted-foreground">
                                     {selectedFile
                                         ? `${Math.ceil(selectedFile.size / 1024)} KB`
-                                        : 'Atau klik untuk memilih file dari komputer'}
+                                        : t('orClickToSelect')}
                                 </p>
                             </div>
                             <DialogFooter>
@@ -200,7 +210,7 @@ export default function StudentsIndex({ students, classOptions, filters, search 
                                     onClick={() => setShowUploadDialog(false)}
                                     disabled={isUploading}
                                 >
-                                    Cancel
+                                    {t('cancel')}
                                 </Button>
                                 <Button
                                     type="button"
@@ -208,7 +218,7 @@ export default function StudentsIndex({ students, classOptions, filters, search 
                                     disabled={!selectedFile || isUploading}
                                 >
                                     <FileUp className="mr-2" size={16} />
-                                    {isUploading ? 'Uploading...' : 'Upload File'}
+                                    {isUploading ? t('uploading') : t('uploadFile')}
                                 </Button>
                             </DialogFooter>
                         </DialogContent>
@@ -227,7 +237,7 @@ export default function StudentsIndex({ students, classOptions, filters, search 
                         }
                         onChange={(e) => handleFilterChange(e.target.value)}
                     >
-                        <option value="">All Classes</option>
+                        <option value="">{t('allClasses')}</option>
                         {classOptions.map((option, i) => (
                             <option key={i} value={`${option.major_id}-${option.class_id}`}>
                                 {option.label}
@@ -271,7 +281,7 @@ export default function StudentsIndex({ students, classOptions, filters, search 
                                                             className="my-auto"
                                                             size={16}
                                                         />{' '}
-                                                        Edit
+                                                        {t('edit')}
                                                     </Link>
                                                 </DropdownMenuLabel>
                                                 <DropdownMenuItem>
@@ -305,7 +315,7 @@ export default function StudentsIndex({ students, classOptions, filters, search 
                                                         className="my-auto"
                                                         size={16}
                                                     />{' '}
-                                                    Delete
+                                                    {t('delete')}
                                                 </DropdownMenuItem>
                                             </DropdownMenuGroup>
                                         </DropdownMenuContent>
@@ -320,19 +330,40 @@ export default function StudentsIndex({ students, classOptions, filters, search 
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            Are you sure want to delete {deleteStudentName}?
+                            {t('areYouSureDelete', { name: deleteStudentName })}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone. This will permanently
+                            {t('deleteDialogDesc')}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                             variant="destructive"
                             onClick={handleDelete}
                         >
-                            Delete
+                            {t('delete')}
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
+            <AlertDialog open={showDeleteAllAlert} onOpenChange={setShowDeleteAllAlert}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>
+                            {t('deleteAllStudentsTitle')}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription>
+                            {t('deleteAllStudentsDesc')}
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
+                        <AlertDialogAction
+                            variant="destructive"
+                            onClick={handleDeleteAll}
+                        >
+                            {t('deleteAll')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

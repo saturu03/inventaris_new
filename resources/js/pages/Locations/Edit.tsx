@@ -7,9 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { index, edit, update } from '@/routes/locations';
+import { useLanguage } from '@/contexts/language-context';
 import type { BreadcrumbItem, Location, LocationForm } from '@/types';
 
 export default function LocationEdit({ location }: { location: Location }) {
+    const { t } = useLanguage();
     const breadcrumbs: BreadcrumbItem[] = [
         {
             title: 'Manage Locations',
@@ -44,7 +46,7 @@ export default function LocationEdit({ location }: { location: Location }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Location" />
             <div className="flex h-full flex-col gap-4 overflow-x-auto p-4">
-                <h3 className="text-lg font-medium">Edit Location</h3>
+                <h3 className="text-lg font-medium">{t('editLocation')}</h3>
                 <Separator />
                 <form
                     onSubmit={handleSubmit}
@@ -56,7 +58,7 @@ export default function LocationEdit({ location }: { location: Location }) {
                             htmlFor="name"
                             className="block text-sm font-medium"
                         >
-                            Name
+                            {t('name')}
                         </Label>
                         <Input
                             type="text"
@@ -71,7 +73,7 @@ export default function LocationEdit({ location }: { location: Location }) {
 
                     <div className="flex items-center gap-4">
                         <Button type="submit" disabled={processing}>
-                            Edit
+                            {t('edit')}
                         </Button>
                         <Transition
                             show={recentlySuccessful}
@@ -80,7 +82,7 @@ export default function LocationEdit({ location }: { location: Location }) {
                             leave="transition ease-in-out"
                             leaveTo="opacity-0"
                         >
-                            <p className="text-sm text-green-600">Updated.</p>
+                            <p className="text-sm text-green-600">{t('updated')}</p>
                         </Transition>
                     </div>
                 </form>

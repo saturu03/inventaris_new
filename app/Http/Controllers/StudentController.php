@@ -137,13 +137,20 @@ class StudentController extends Controller
         $student->delete();
     }
 
+    public function destroyAll()
+    {
+        Student::query()->delete();
+
+        return redirect()->route('students.index')->with('success', 'All students deleted successfully.');
+    }
+
     /**
      * @throws Exception
      * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
      */
     public function export()
     {
-        return Excel::download(new StudentExport, 'students.xlsx'); // Menggunakan kelas StudentExport untuk mengekspor data siswa ke file Excel dengan nama students.xlsx
+        return Excel::download(new StudentExport, 'students.xlsx');
     }
 
     public function import(Request $request)

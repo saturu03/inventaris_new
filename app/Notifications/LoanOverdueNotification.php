@@ -30,7 +30,7 @@ class LoanOverdueNotification extends Notification
             'message' => "Peminjaman atas nama {$this->loan->borrower_name} sudah melewati batas waktu pengembalian.",
             'borrower_name' => $this->loan->borrower_name,
             'estimated_return_date' => $this->loan->estimated_return_date?->format('d M Y'),
-            'days_overdue' => now()->diffInDays($this->loan->estimated_return_date),
+            'days_overdue' => (int) ceil(now()->diffInDays($this->loan->estimated_return_date)),
         ];
     }
 }

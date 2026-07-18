@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Surat Panggilan Pengembalian Barang</title>
+    <title>Surat Panggilan</title>
     <style>
         body { font-family: sans-serif; font-size: 12px; }
         .page-break { page-break-after: always; }
@@ -26,7 +26,7 @@
     </style>
 </head>
 <body>
-    @forelse($sections as $major => $section)
+    @forelse($sections as $label => $section)
         <div class="page-break">
             <div class="header">
                 <div class="school-name">INVENTRA SCHOOL</div>
@@ -36,26 +36,26 @@
             </div>
 
             <div class="letter-body">
-                <p>Yang terhormat Bapak/Ibu Wali Kelas,</p>
-                <p>Bersama ini kami sampaikan daftar siswa dari jurusan <strong>{{ $major }}</strong> yang masih memiliki tanggungan barang inventaris yang belum dikembalikan. Mohon bantuan Bapak/Ibu untuk menyampaikan kepada siswa yang bersangkutan agar segera mengembalikan barang yang dipinjam.</p>
+                <p>Kepada Yth. Wali Kelas <strong>{{ $label }}</strong>,</p>
+                <p>Kami memberitahukan bahwa siswa-siswa di bawah ini dari jurusan <strong>{{ $section['major'] }}</strong> kelas <strong>{{ $section['classLevel'] }}</strong> masih memiliki barang inventaris yang belum dikembalikan. Kami mohon bantuan Bapak/Ibu untuk memberitahu siswa yang bersangkutan agar segera mengembalikan barang yang dipinjam.</p>
             </div>
 
             @if($section['homeroomTeacher'])
                 <div class="teacher-info">
-                    <h3>Wali Kelas {{ $major }}</h3>
-                    <p>Nama: {{ $section['homeroomTeacher']['name'] }}</p>
-                    <p>No. WhatsApp: {{ $section['homeroomTeacher']['phone'] }}</p>
+                    <h3>Wali Kelas - {{ $label }}</h3>
+                    <p>Nama: {{ $section['homeroomTeacher']->name }}</p>
+                    <p>WhatsApp: {{ $section['homeroomTeacher']->phone }}</p>
                 </div>
             @else
                 <div class="teacher-info" style="background: #fef3c7; border-color: #fcd34d;">
-                    <p style="color: #92400e;"><em>Data wali kelas untuk jurusan {{ $major }} belum diisi.</em></p>
+                    <p style="color: #92400e;"><em>Data wali kelas untuk {{ $label }} belum diisi.</em></p>
                 </div>
             @endif
 
             <table>
                 <thead>
                     <tr>
-                        <th>#</th>
+                        <th>No</th>
                         <th>Nama Siswa</th>
                         <th>NIS</th>
                         <th>Kelas</th>
@@ -70,17 +70,17 @@
                         <td>{{ $i + 1 }}</td>
                         <td>{{ $loan->student?->name ?? $loan->borrower_name }}</td>
                         <td>{{ $loan->student?->nis ?? '-' }}</td>
-                        <td>{{ $loan->student ? trim($loan->student->class?->level . ' ' . preg_replace('/\d+$/', '', $loan->student->major?->alias ?? '') . ' ' . preg_replace('/^[A-Za-z]+/', '', $loan->student->major?->alias ?? '')) : '-' }}</td>
+                        <td>{{ $section['classLevel'] }} {{ $section['major'] }}</td>
                         <td>{{ $loan->item->name }}</td>
                         <td>{{ \Carbon\Carbon::parse($loan->borrower_date)->format('d M Y') }}</td>
-                        <td>{{ \Carbon\Carbon::parse($loan->borrower_date)->diffInDays(now()) }} hari</td>
+                        <td>{{ (int) ceil(now()->diffInDays($loan->estimated_return_date)) }} hari</td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
 
             <div class="footer">
-                <p>Demikian surat panggilan ini dibuat, atas perhatian dan kerjasamanya kami ucapkan terima kasih.</p>
+                <p>Demikian surat ini kami sampaikan. Atas perhatian dan kerjasamanya, kami ucapkan terima kasih.</p>
                 <div class="signature">
                     <p>Proktor,</p>
                     <p class="name">{{ $userName ?? '__________' }}</p>

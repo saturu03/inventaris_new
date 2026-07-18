@@ -1,6 +1,7 @@
 import { Transition } from '@headlessui/react';
 import { Head, useForm } from '@inertiajs/react';
 import { Plus, Trash2 } from 'lucide-react';
+import { useLanguage } from '@/contexts/language-context';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function DepositCreate() {
+    const { t } = useLanguage();
     const {
         data,
         setData,
@@ -75,7 +77,7 @@ export default function DepositCreate() {
                     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                         <div className="space-y-2">
                             <Label htmlFor="depositor_name" className="block text-sm font-medium">
-                                Depositor Name
+                                {t('depositor')}
                             </Label>
                             <Input
                                 type="text"
@@ -90,7 +92,7 @@ export default function DepositCreate() {
 
                         <div className="space-y-2">
                             <Label htmlFor="depositor_phone" className="block text-sm font-medium">
-                                Phone Number
+                                {t('phone')}
                             </Label>
                             <Input
                                 type="text"
@@ -104,7 +106,7 @@ export default function DepositCreate() {
 
                         <div className="space-y-2">
                             <Label htmlFor="deposit_date" className="block text-sm font-medium">
-                                Deposit Date
+                                {t('depositDate')}
                             </Label>
                             <Input
                                 type="datetime-local"
@@ -119,7 +121,7 @@ export default function DepositCreate() {
 
                         <div className="space-y-2">
                             <Label htmlFor="estimated_pickup_date" className="block text-sm font-medium">
-                                Estimasi Ambil
+                                {t('estimatedPickup')}
                             </Label>
                             <Input
                                 type="datetime-local"
@@ -134,7 +136,7 @@ export default function DepositCreate() {
 
                     <div className="space-y-2">
                         <Label htmlFor="notes" className="block text-sm font-medium">
-                            Notes
+                            {t('notes')}
                         </Label>
                         <Textarea
                             name="notes"
@@ -149,7 +151,7 @@ export default function DepositCreate() {
 
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <Label className="text-sm font-medium">Items</Label>
+                            <Label className="text-sm font-medium">{t('items')}</Label>
                             <Button
                                 type="button"
                                 variant="outline"
@@ -157,7 +159,7 @@ export default function DepositCreate() {
                                 onClick={addItem}
                             >
                                 <Plus className="mr-1 size-4" />
-                                Add Item
+                                {t('addDepositItem')}
                             </Button>
                         </div>
 
@@ -172,7 +174,7 @@ export default function DepositCreate() {
                                             htmlFor={`item_name_${itemIndex}`}
                                             className="block text-sm font-medium"
                                         >
-                                            Item Name
+                                            {t('itemName')}
                                         </Label>
                                         <Input
                                             type="text"
@@ -196,7 +198,7 @@ export default function DepositCreate() {
                                             htmlFor={`quantity_${itemIndex}`}
                                             className="block text-sm font-medium"
                                         >
-                                            Qty
+                                            {t('qty')}
                                         </Label>
                                         <Input
                                             type="number"
@@ -234,7 +236,7 @@ export default function DepositCreate() {
                                         htmlFor={`item_notes_${itemIndex}`}
                                         className="block text-sm font-medium"
                                     >
-                                        Item Notes
+                                        {t('notes')}
                                     </Label>
                                     <Input
                                         type="text"
@@ -253,7 +255,7 @@ export default function DepositCreate() {
 
                     <div className="flex items-center gap-4">
                         <Button type="submit" disabled={processing}>
-                            Add
+                            {t('add')}
                         </Button>
                         <Transition
                             show={recentlySuccessful}
@@ -262,7 +264,7 @@ export default function DepositCreate() {
                             leave="transition ease-in-out"
                             leaveTo="opacity-0"
                         >
-                            <p className="text-sm text-green-600">Added.</p>
+                            <p className="text-sm text-green-600">{t('added')}</p>
                         </Transition>
                     </div>
                 </form>

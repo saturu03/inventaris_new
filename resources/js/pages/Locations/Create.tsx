@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import AppLayout from '@/layouts/app-layout';
 import { index, create, store } from '@/routes/locations';
+import { useLanguage } from '@/contexts/language-context';
 import type { BreadcrumbItem, LocationForm } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -21,6 +22,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function LocationCreate() {
+    const { t } = useLanguage();
     const {
         data,
         setData,
@@ -44,7 +46,7 @@ export default function LocationCreate() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Add a new Location" />
             <div className="flex h-full flex-col gap-4 overflow-x-auto p-4">
-                <h3 className="text-lg font-medium">Add a new Location</h3>
+                <h3 className="text-lg font-medium">{t('addLocationTitle')}</h3>
                 <Separator />
                 <form
                     onSubmit={handleSubmit}
@@ -56,7 +58,7 @@ export default function LocationCreate() {
                             htmlFor="name"
                             className="block text-sm font-medium"
                         >
-                            Name
+                            {t('name')}
                         </Label>
                         <Input
                             type="text"
@@ -71,7 +73,7 @@ export default function LocationCreate() {
 
                     <div className="flex items-center gap-4">
                         <Button type="submit" disabled={processing}>
-                            Add
+                            {t('add')}
                         </Button>
                         <Transition
                             show={recentlySuccessful}
@@ -80,7 +82,7 @@ export default function LocationCreate() {
                             leave="transition ease-in-out"
                             leaveTo="opacity-0"
                         >
-                            <p className="text-sm text-green-600">Added.</p>
+                            <p className="text-sm text-green-600">{t('added')}</p>
                         </Transition>
                     </div>
                 </form>

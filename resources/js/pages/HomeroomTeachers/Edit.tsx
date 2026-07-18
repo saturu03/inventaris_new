@@ -6,15 +6,32 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
+import { useLanguage } from '@/contexts/language-context';
 import AppLayout from '@/layouts/app-layout';
 import { index, edit, update } from '@/routes/homeroom-teachers';
 import type { BreadcrumbItem } from '@/types';
-import type { HomeroomTeacher } from '@/types/homeroom-teacher';
 
-const classLevels = ['10', '11', '12'] as const;
-const majors = ['PPLG1', 'PPLG2', 'TKR1', 'TKR2', 'TBSM1', 'TBSM2', 'MPLB1', 'MPLB2'] as const;
+type ClassLevel = {
+    id: number;
+    level: string;
+};
 
-export default function HomeroomTeacherEdit({ homeroomTeacher }: { homeroomTeacher: HomeroomTeacher }) {
+type Major = {
+    id: number;
+    alias: string;
+    full_name: string;
+};
+
+type HomeroomTeacher = {
+    id: number;
+    name: string;
+    major_id: number;
+    class_id: number;
+    phone: string;
+};
+
+export default function HomeroomTeacherEdit({ homeroomTeacher, classLevels, majors }: { homeroomTeacher: HomeroomTeacher; classLevels: ClassLevel[]; majors: Major[] }) {
+    const { t } = useLanguage();
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Wali Kelas', href: index() },
         { title: 'Edit Wali Kelas', href: edit(homeroomTeacher.id) },
@@ -23,8 +40,8 @@ export default function HomeroomTeacherEdit({ homeroomTeacher }: { homeroomTeach
     const { data, setData, put, errors, processing, recentlySuccessful } =
         useForm({
             name: homeroomTeacher.name,
-            class_level: homeroomTeacher.class_level,
-            major: homeroomTeacher.major,
+            class_id: homeroomTeacher.class_id,
+            major_id: homeroomTeacher.major_id,
             phone: homeroomTeacher.phone,
         });
 
@@ -37,59 +54,59 @@ export default function HomeroomTeacherEdit({ homeroomTeacher }: { homeroomTeach
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Wali Kelas" />
             <div className="flex h-full flex-col gap-4 overflow-x-auto p-4">
-                <h3 className="text-lg font-medium">Edit Wali Kelas</h3>
+                <h3 className="text-lg font-medium">{t('editHomeroomTeacher')}</h3>
                 <Separator />
                 <form onSubmit={handleSubmit} method="post" className="space-y-6">
                     <div className="space-y-2">
-                        <Label htmlFor="name">Name</Label>
+                        <Label htmlFor="name">{t('name')}</Label>
                         <Input type="text" id="name" required value={data.name} onChange={(e) => setData('name', e.target.value)} />
                         <InputError className="mt-2" message={errors.name} />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="class_level">Kelas</Label>
+                        <Label htmlFor="class_id">{t('classLabel')}</Label>
                         <RadioGroup
-                            value={data.class_level}
-                            onValueChange={(value) => setData('class_level', value)}
+                            value={String(data.class_id)}
+                            onValueChange={(value) => setData('class_id', Number(value))}
                             className="flex flex-wrap gap-4"
                         >
-                            {classLevels.map((level) => (
-                                <div key={level} className="flex items-center gap-2">
-                                    <RadioGroupItem value={level} id={`class_${level}`} />
-                                    <Label htmlFor={`class_${level}`}>{level}</Label>
+                            {classLevels.map((cls) => (
+                                <div key={cls.id} className="flex items-center gap-2">
+                                    <RadioGroupItem value={String(cls.id)} id={`class_${cls.id}`} />
+                                    <Label htmlFor={`class_${cls.id}`}>{cls.level}</Label>
                                 </div>
                             ))}
                         </RadioGroup>
-                        <InputError className="mt-2" message={errors.class_level} />
+                        <InputError className="mt-2" message={errors.class_id} />
                     </div>
 
                     <div className="space-y-2">
-                        <Label>Jurusan</Label>
+                        <Label>{t('majorLabel')}</Label>
                         <RadioGroup
-                            value={data.major}
-                            onValueChange={(value) => setData('major', value)}
+                            value={String(data.major_id)}
+                            onValueChange={(value) => setData('major_id', Number(value))}
                             className="flex flex-wrap gap-4"
                         >
                             {majors.map((major) => (
-                                <div key={major} className="flex items-center gap-2">
-                                    <RadioGroupItem value={major} id={major} />
-                                    <Label htmlFor={major}>{major}</Label>
+                                <div key={major.id} className="flex items-center gap-2">
+                                    <RadioGroupItem value={String(major.id)} id={`major_${major.id}`} />
+                                    <Label htmlFor={`major_${major.id}`}>{major.alias}</Label>
                                 </div>
                             ))}
                         </RadioGroup>
-                        <InputError className="mt-2" message={errors.major} />
+                        <InputError className="mt-2" message={errors.major_id} />
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="phone">No. WhatsApp</Label>
+                        <Label htmlFor="phone">{t('whatsapp')}</Label>
                         <Input type="text" id="phone" required value={data.phone} onChange={(e) => setData('phone', e.target.value)} placeholder="08xxxxxxxxxx" />
                         <InputError className="mt-2" message={errors.phone} />
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <Button type="submit" disabled={processing}>Edit</Button>
+                        <Button type="submit" disabled={processing}>{t('edit')}</Button>
                         <Transition show={recentlySuccessful} enter="transition ease-in-out" enterFrom="opacity-0" leave="transition ease-in-out" leaveTo="opacity-0">
-                            <p className="text-sm text-green-600">Updated.</p>
+                            <p className="text-sm text-green-600">{t('updated')}</p>
                         </Transition>
                     </div>
                 </form>

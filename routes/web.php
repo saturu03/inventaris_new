@@ -13,13 +13,14 @@ use App\Http\Controllers\NotificationsController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
-use Laravel\Fortify\Features;
 
-Route::inertia('/', 'welcome', [
-    'canRegister' => Features::enabled(Features::registration()),
-])->name('home');
+Route::get('/', [ItemController::class, 'publicIndex'])->name('home');
 
-Route::get('/items/status', [ItemController::class, 'publicIndex'])->name('items.public');
+Route::get('/welcome', function () {
+    return inertia('welcome', [
+        'canRegister' => \Laravel\Fortify\Features::enabled(\Laravel\Fortify\Features::registration()),
+    ]);
+})->name('welcome');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -30,6 +31,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/students', [StudentController::class, 'index'])->name('students.index');
     Route::get('/students/create', [StudentController::class, 'create'])->name('students.create');
     Route::post('/students', [StudentController::class, 'store'])->name('students.store');
+    Route::delete('/students/all', [StudentController::class, 'destroyAll'])->name('students.destroy-all');
     Route::get('/students/{student:id}/edit', [StudentController::class, 'edit'])->name('students.edit');
     Route::put('/students/{student:id}/', [StudentController::class, 'update'])->name('students.update');
     Route::delete('/students/{student:id}/', [StudentController::class, 'destroy'])->name('students.destroy');

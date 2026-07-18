@@ -1,6 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { Ellipsis, Plus, SquarePen, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { useLanguage } from '@/contexts/language-context';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -42,9 +43,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 const tabs = [
-    { label: 'All', value: 'all' },
-    { label: 'Deposited', value: 'deposited' },
-    { label: 'Picked Up', value: 'picked_up' },
+    { label: 'all', value: 'all' },
+    { label: 'deposited', value: 'deposited' },
+    { label: 'pickedUp', value: 'picked_up' },
 ];
 
 export default function DepositsIndex({
@@ -54,6 +55,7 @@ export default function DepositsIndex({
     deposits: Deposit[];
     filter: string;
 }) {
+    const { t } = useLanguage();
     const [deleteId, setDeleteId] = useState(0);
     const [deleteName, setDeleteName] = useState('');
     const [showAlert, setShowAlert] = useState(false);
@@ -78,7 +80,7 @@ export default function DepositsIndex({
                                 size="sm"
                                 onClick={() => router.get(depositsIndex(), { filter: tab.value }, { preserveState: true })}
                             >
-                                {tab.label}
+                                {t(tab.label)}
                             </Button>
                         ))}
                     </div>
@@ -91,7 +93,7 @@ export default function DepositsIndex({
                 </div>
 
                 {deposits.length === 0 && (
-                    <div className="py-12 text-center text-muted-foreground">No deposits found.</div>
+                    <div className="py-12 text-center text-muted-foreground">{t('noDeposits')}</div>
                 )}
 
                 {deposits.length > 0 && (
@@ -100,13 +102,13 @@ export default function DepositsIndex({
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>#</TableHead>
-                                    <TableHead>Depositor</TableHead>
-                                    <TableHead>Phone</TableHead>
-                                    <TableHead>Items</TableHead>
-                                    <TableHead>Deposit Date</TableHead>
-                                    <TableHead>Est. Pickup</TableHead>
-                                    <TableHead>Status</TableHead>
-                                    <TableHead className="text-right">Action</TableHead>
+                                    <TableHead>{t('depositor')}</TableHead>
+                                    <TableHead>{t('phone')}</TableHead>
+                                    <TableHead>{t('items')}</TableHead>
+                                    <TableHead>{t('depositDate')}</TableHead>
+                                    <TableHead>{t('estimatedPickup')}</TableHead>
+                                    <TableHead>{t('status')}</TableHead>
+                                    <TableHead className="text-right">{t('action')}</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -126,7 +128,7 @@ export default function DepositsIndex({
                                         <TableCell>{deposit.estimated_pickup_date ?? '-'}</TableCell>
                                         <TableCell>
                                             <Badge variant={deposit.status === 'picked_up' ? 'default' : 'secondary'}>
-                                                {deposit.status === 'picked_up' ? 'Picked Up' : 'Deposited'}
+                                                {deposit.status === 'picked_up' ? t('pickedUp') : t('deposited')}
                                             </Badge>
                                         </TableCell>
                                         <TableCell className="text-right">
@@ -143,15 +145,15 @@ export default function DepositsIndex({
                                                                 href={edit(deposit.id)}
                                                                 className="flex gap-4"
                                                             >
-                                                                <SquarePen className="my-auto" size={16} /> Edit
+                                                                 <SquarePen className="my-auto" size={16} /> {t('edit')}
                                                             </Link>
                                                         </DropdownMenuLabel>
                                                         {deposit.status === 'deposited' && (
                                                             <DropdownMenuItem
                                                                 onSelect={() => router.put(pickup.url(deposit.id))}
-                                                            >
-                                                                Picked Up
-                                                            </DropdownMenuItem>
+                                                                >
+                                                                    {t('pickedUp')}
+                                                                </DropdownMenuItem>
                                                         )}
                                                     </DropdownMenuGroup>
                                                     <DropdownMenuSeparator />
@@ -164,7 +166,7 @@ export default function DepositsIndex({
                                                                 setShowAlert(true);
                                                             }}
                                                         >
-                                                            <Trash2 className="my-auto" size={16} /> Delete
+                                                             <Trash2 className="my-auto" size={16} /> {t('delete')}
                                                         </DropdownMenuItem>
                                                     </DropdownMenuGroup>
                                                 </DropdownMenuContent>
@@ -181,16 +183,16 @@ export default function DepositsIndex({
                 <AlertDialogContent>
                     <AlertDialogHeader>
                         <AlertDialogTitle>
-                            Are you sure want to delete deposit from {deleteName}?
+                            {t('areYouSureDelete', { name: deleteName })}
                         </AlertDialogTitle>
                         <AlertDialogDescription>
-                            This action cannot be undone.
+                            {t('thisActionCannotUndone')}
                         </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                         <AlertDialogAction variant="destructive" onClick={handleDelete}>
-                            Delete
+                            {t('delete')}
                         </AlertDialogAction>
                     </AlertDialogFooter>
                 </AlertDialogContent>

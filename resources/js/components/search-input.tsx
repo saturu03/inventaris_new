@@ -1,8 +1,10 @@
 import { router } from '@inertiajs/react';
 import { Search, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useLanguage } from '@/contexts/language-context';
 
-export function SearchInput({ route, currentSearch = '', placeholder = 'Cari...' }: { route: string; currentSearch?: string; placeholder?: string }) {
+export function SearchInput({ route, currentSearch = '', placeholder }: { route: string; currentSearch?: string; placeholder?: string }) {
+    const { t } = useLanguage();
     const [value, setValue] = useState(currentSearch);
     const timeoutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
@@ -32,7 +34,7 @@ export function SearchInput({ route, currentSearch = '', placeholder = 'Cari...'
                 type="text"
                 value={value}
                 onChange={(e) => handleSearch(e.target.value)}
-                placeholder={placeholder}
+                placeholder={placeholder || t('search')}
                 className="flex h-9 w-full min-w-0 rounded-md border border-input bg-transparent px-3 py-1 pl-9 pr-8 text-base shadow-sm transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
             />
             {value && (

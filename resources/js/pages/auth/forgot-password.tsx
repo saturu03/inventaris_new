@@ -6,15 +6,18 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useLanguage } from '@/contexts/language-context';
 import AuthLayout from '@/layouts/auth-layout';
 import { login } from '@/routes';
 import { email } from '@/routes/password';
 
 export default function ForgotPassword({ status }: { status?: string }) {
+    const { t } = useLanguage();
+
     return (
         <AuthLayout
-            title="Forgot password"
-            description="Enter your email to receive a password reset link"
+            title={t('forgotPasswordTitle')}
+            description={t('forgotPasswordDesc')}
         >
             <Head title="Forgot password" />
 
@@ -29,7 +32,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                                <Label htmlFor="email">{t('emailAddress')}</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -51,7 +54,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
                                     {processing && (
                                         <LoaderCircle className="h-4 w-4 animate-spin" />
                                     )}
-                                    Email password reset link
+                                    {t('emailPasswordResetLink')}
                                 </Button>
                             </div>
                         </>
@@ -59,8 +62,8 @@ export default function ForgotPassword({ status }: { status?: string }) {
                 </Form>
 
                 <div className="space-x-1 text-center text-sm text-muted-foreground">
-                    <span>Or, return to</span>
-                    <TextLink href={login()}>log in</TextLink>
+                    <span>{t('orReturnTo')}</span>
+                    <TextLink href={login()}>{t('login')}</TextLink>
                 </div>
             </div>
         </AuthLayout>

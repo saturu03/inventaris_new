@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/user-password';
+import { useLanguage } from '@/contexts/language-context';
 import type { BreadcrumbItem } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -22,6 +23,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function Password() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
+    const { t } = useLanguage();
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -33,8 +35,8 @@ export default function Password() {
                 <div className="space-y-6">
                     <Heading
                         variant="small"
-                        title="Update password"
-                        description="Ensure your account is using a long, random password to stay secure"
+                        title={t('updatePassword')}
+                        description={t('updatePasswordDesc')}
                     />
 
                     <Form
@@ -63,7 +65,7 @@ export default function Password() {
                             <>
                                 <div className="grid gap-2">
                                     <Label htmlFor="current_password">
-                                        Current password
+                                        {t('currentPassword')}
                                     </Label>
 
                                     <Input
@@ -73,7 +75,7 @@ export default function Password() {
                                         type="password"
                                         className="mt-1 block w-full"
                                         autoComplete="current-password"
-                                        placeholder="Current password"
+                                        placeholder={t('currentPassword')}
                                     />
 
                                     <InputError
@@ -83,7 +85,7 @@ export default function Password() {
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="password">
-                                        New password
+                                        {t('newPasswordLabel')}
                                     </Label>
 
                                     <Input
@@ -93,7 +95,7 @@ export default function Password() {
                                         type="password"
                                         className="mt-1 block w-full"
                                         autoComplete="new-password"
-                                        placeholder="New password"
+                                        placeholder={t('newPasswordLabel')}
                                     />
 
                                     <InputError message={errors.password} />
@@ -101,7 +103,7 @@ export default function Password() {
 
                                 <div className="grid gap-2">
                                     <Label htmlFor="password_confirmation">
-                                        Confirm password
+                                        {t('confirmPasswordLabel')}
                                     </Label>
 
                                     <Input
@@ -110,7 +112,7 @@ export default function Password() {
                                         type="password"
                                         className="mt-1 block w-full"
                                         autoComplete="new-password"
-                                        placeholder="Confirm password"
+                                        placeholder={t('confirmPasswordLabel')}
                                     />
 
                                     <InputError
@@ -123,7 +125,7 @@ export default function Password() {
                                         disabled={processing}
                                         data-test="update-password-button"
                                     >
-                                        Save password
+                                        {t('savePassword')}
                                     </Button>
 
                                     <Transition
@@ -134,7 +136,7 @@ export default function Password() {
                                         leaveTo="opacity-0"
                                     >
                                         <p className="text-sm text-neutral-600">
-                                            Saved
+                                            {t('saved')}
                                         </p>
                                     </Transition>
                                 </div>

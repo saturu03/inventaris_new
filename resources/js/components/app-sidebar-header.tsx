@@ -1,5 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { LanguageToggle } from '@/components/language-toggle';
 import { NotificationBell } from '@/components/notification-bell';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import type { BreadcrumbItem as BreadcrumbItemType } from '@/types';
@@ -17,7 +18,8 @@ export function AppSidebarHeader({
                 <SidebarTrigger className="-ml-1" />
                 <Breadcrumbs breadcrumbs={breadcrumbs} />
             </div>
-            <div className="ml-auto flex items-center">
+            <div className="ml-auto flex items-center gap-1">
+                <LanguageToggle />
                 {notifications && (
                     <NotificationBell unreadCount={notifications.unreadCount} recent={notifications.recent} />
                 )}

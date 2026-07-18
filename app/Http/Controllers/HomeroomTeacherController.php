@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Classlevel;
 use App\Models\HomeroomTeacher;
+use App\Models\Major;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -10,7 +12,7 @@ class HomeroomTeacherController extends Controller
 {
     public function index(Request $request)
     {
-        $homeroomTeachers = HomeroomTeacher::latest()->get();
+        $homeroomTeachers = HomeroomTeacher::with(['major', 'class'])->latest()->get();
 
         return Inertia::render('HomeroomTeachers/Index', [
             'homeroomTeachers' => $homeroomTeachers,
@@ -19,15 +21,18 @@ class HomeroomTeacherController extends Controller
 
     public function create()
     {
-        return Inertia::render('HomeroomTeachers/Create');
+        return Inertia::render('HomeroomTeachers/Create', [
+            'classLevels' => Classlevel::all(['id', 'level']),
+            'majors' => Major::all(['id', 'alias', 'full_name']),
+        ]);
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'class_level' => 'required|in:10,11,12',
-            'major' => 'required|in:PPLG1,PPLG2,TKR1,TKR2,TBSM1,TBSM2,MPLB1,MPLB2',
+            'major_id' => 'required|exists:majors,id',
+            'class_id' => 'required|exists:classes,id',
             'phone' => 'required|string|max:20',
         ]);
 
@@ -38,8 +43,12 @@ class HomeroomTeacherController extends Controller
 
     public function edit(HomeroomTeacher $homeroomTeacher)
     {
+        $homeroomTeacher->load(['major', 'class']);
+
         return Inertia::render('HomeroomTeachers/Edit', [
             'homeroomTeacher' => $homeroomTeacher,
+            'classLevels' => Classlevel::all(['id', 'level']),
+            'majors' => Major::all(['id', 'alias', 'full_name']),
         ]);
     }
 
@@ -47,8 +56,8 @@ class HomeroomTeacherController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'class_level' => 'required|in:10,11,12',
-            'major' => 'required|in:PPLG1,PPLG2,TKR1,TKR2,TBSM1,TBSM2,MPLB1,MPLB2',
+            'major_id' => 'required|exists:majors,id',
+            'class_id' => 'required|exists:classes,id',
             'phone' => 'required|string|max:20',
         ]);
 

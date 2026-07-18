@@ -1,6 +1,7 @@
 import { router } from '@inertiajs/react';
 import { Bell } from 'lucide-react';
 import { useState } from 'react';
+import { useLanguage } from '@/contexts/language-context';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -23,6 +24,7 @@ interface NotificationItem {
 }
 
 export function NotificationBell({ unreadCount, recent }: { unreadCount: number; recent: NotificationItem[] }) {
+    const { t } = useLanguage();
     const [open, setOpen] = useState(false);
 
     const handleMarkAsRead = (id: string) => {
@@ -53,15 +55,15 @@ export function NotificationBell({ unreadCount, recent }: { unreadCount: number;
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-80">
                 <DropdownMenuLabel className="flex items-center justify-between">
-                    <span>Notifications</span>
+                    <span>{t('notificationsTitle')}</span>
                     {unreadCount > 0 && (
-                        <span className="text-xs text-muted-foreground">{unreadCount} unread</span>
+                        <span className="text-xs text-muted-foreground">{t('unread', { n: unreadCount })}</span>
                     )}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {recent.length === 0 ? (
                     <div className="px-2 py-6 text-center text-sm text-muted-foreground">
-                        No notifications
+                        {t('noNotifications')}
                     </div>
                 ) : (
                     recent.map((notification) => (
@@ -83,7 +85,7 @@ export function NotificationBell({ unreadCount, recent }: { unreadCount: number;
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild className="justify-center text-sm font-medium cursor-pointer">
-                    <a href={notificationsIndex().url}>View all notifications</a>
+                    <a href={notificationsIndex().url}>{t('viewAllNotifications')}</a>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>
