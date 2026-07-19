@@ -33,6 +33,7 @@ import {
 import AppLayout from '@/layouts/app-layout';
 import { destroy, pdf, returned } from '@/routes/loans';
 import type { BreadcrumbItem, Loan } from '@/types';
+import { formatDateTime } from '@/lib/utils';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -147,9 +148,9 @@ export default function LoansReturned({
                                                     <TableCell>{loan.item.name}</TableCell>
                                                     <TableCell>{loan.user_out?.name}</TableCell>
                                                     <TableCell>{loan.borrower_name}</TableCell>
-                                                    <TableCell>{loan.borrower_date}</TableCell>
+                                                    <TableCell>{formatDateTime(loan.borrower_date)}</TableCell>
                                                     <TableCell>
-                                                        {loan.estimated_return_date ?? '-'}
+                                                        {formatDateTime(loan.estimated_return_date)}
                                                     </TableCell>
                                                     <TableCell>
                                                         {(() => {
@@ -161,7 +162,7 @@ export default function LoansReturned({
                                                         })()}
                                                     </TableCell>
                                                     <TableCell>
-                                                        {loan.returned ? loan.returned : '-'}
+                                                        {formatDateTime(loan.returned)}
                                                     </TableCell>
                                                     <TableCell>
                                                         {loan.user_in?.name ?? '-'}

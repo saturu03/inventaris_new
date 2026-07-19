@@ -8,6 +8,7 @@ import { index as depositsIndex } from '@/routes/deposits';
 import { index as studentsIndex } from '@/routes/students';
 import { useLanguage } from '@/contexts/language-context';
 import type { BreadcrumbItem } from '@/types';
+import { formatDateTime } from '@/lib/utils';
 
 type StatCard = {
     title: string;
@@ -182,7 +183,7 @@ export default function Dashboard({
                                                     {loan.student_name ?? loan.borrower_name}
                                                 </td>
                                                 <td className="py-2.5 pr-4 text-gray-600 dark:text-gray-400">
-                                                    {loan.borrower_date}
+                                                    {formatDateTime(loan.borrower_date)}
                                                 </td>
                                                 <td className="py-2.5 text-right">
                                                     {loan.returned ? (

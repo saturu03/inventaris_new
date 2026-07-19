@@ -34,6 +34,7 @@ import {
 import AppLayout from '@/layouts/app-layout';
 import { index as depositsIndex, create, destroy, edit, pickup } from '@/routes/deposits';
 import type { BreadcrumbItem, Deposit } from '@/types';
+import { formatDateTime } from '@/lib/utils';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -124,8 +125,8 @@ export default function DepositsIndex({
                                                 </div>
                                             ))}
                                         </TableCell>
-                                        <TableCell>{deposit.deposit_date}</TableCell>
-                                        <TableCell>{deposit.estimated_pickup_date ?? '-'}</TableCell>
+                                        <TableCell>{formatDateTime(deposit.deposit_date)}</TableCell>
+                                        <TableCell>{formatDateTime(deposit.estimated_pickup_date)}</TableCell>
                                         <TableCell>
                                             <Badge variant={deposit.status === 'picked_up' ? 'default' : 'secondary'}>
                                                 {deposit.status === 'picked_up' ? t('pickedUp') : t('deposited')}

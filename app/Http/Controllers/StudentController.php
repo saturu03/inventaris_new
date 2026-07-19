@@ -106,6 +106,13 @@ class StudentController extends Controller
         return Inertia::render('Students/Edit', compact('student', 'majors', 'classes')); // Menampilkan halaman ubah data dan mengirim ke view
     }
 
+    public function show(Student $student)
+    {
+        $student->load(['major', 'class']);
+
+        return Inertia::render('Students/Show', compact('student'));
+    }
+
     public function update(Request $request, Student $student)
     {
         $request->validate([

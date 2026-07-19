@@ -33,6 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/students', [StudentController::class, 'store'])->name('students.store');
     Route::delete('/students/all', [StudentController::class, 'destroyAll'])->name('students.destroy-all');
     Route::get('/students/{student:id}/edit', [StudentController::class, 'edit'])->name('students.edit');
+    Route::get('/students/{student:id}', [StudentController::class, 'show'])->name('students.show');
     Route::put('/students/{student:id}/', [StudentController::class, 'update'])->name('students.update');
     Route::delete('/students/{student:id}/', [StudentController::class, 'destroy'])->name('students.destroy');
     Route::get('/students/download', [StudentController::class, 'export'])->name('students.download');
@@ -118,6 +119,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/notifications', [NotificationsController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{id}/mark-as-read', [NotificationsController::class, 'markAsRead'])->name('notifications.mark-as-read');
     Route::post('/notifications/mark-all-read', [NotificationsController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
+    Route::delete('/notifications/{id}', [NotificationsController::class, 'destroy'])->name('notifications.destroy');
 
     // Route untuk mengelola titipan barang
     Route::get('/deposits', [DepositController::class, 'index'])->name('deposits.index');

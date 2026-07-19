@@ -1,4 +1,4 @@
-import { router } from '@inertiajs/react';
+import { Link, router } from '@inertiajs/react';
 import { Bell } from 'lucide-react';
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/language-context';
@@ -23,7 +23,7 @@ interface NotificationItem {
     created_at: string;
 }
 
-export function NotificationBell({ unreadCount, recent }: { unreadCount: number; recent: NotificationItem[] }) {
+export function NotificationBell({ unreadCount = 0, recent = [] }: { unreadCount?: number; recent?: NotificationItem[] }) {
     const { t } = useLanguage();
     const [open, setOpen] = useState(false);
 
@@ -85,7 +85,7 @@ export function NotificationBell({ unreadCount, recent }: { unreadCount: number;
                 )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild className="justify-center text-sm font-medium cursor-pointer">
-                    <a href={notificationsIndex().url}>{t('viewAllNotifications')}</a>
+                    <Link href={notificationsIndex().url} onClick={() => setOpen(false)}>{t('viewAllNotifications')}</Link>
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

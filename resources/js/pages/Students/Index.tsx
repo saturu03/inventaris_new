@@ -42,7 +42,7 @@ import {
     TableHeader,
 } from '@/components/ui/table';
 import AppLayout from '@/layouts/app-layout';
-import { index, create, edit, destroy, destroyAll, download, upload } from '@/routes/students';
+import { index, create, edit, show, destroy, destroyAll, download, upload } from '@/routes/students';
 import barcode from '@/routes/students/barcode';
 import { SearchInput } from '@/components/search-input';
 import type { BreadcrumbItem, Student } from '@/types';
@@ -229,7 +229,7 @@ export default function StudentsIndex({ students, classOptions, filters, search 
                 </div>
                 <div className="flex flex-row gap-2">
                     <select
-                        className="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                        className="flex h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring dark:text-foreground dark:focus-visible:ring-ring"
                         value={
                             filters.major_id
                                 ? `${filters.major_id}-${filters.class_id}`
@@ -237,9 +237,9 @@ export default function StudentsIndex({ students, classOptions, filters, search 
                         }
                         onChange={(e) => handleFilterChange(e.target.value)}
                     >
-                        <option value="">{t('allClasses')}</option>
+                        <option className="dark:bg-zinc-800 dark:text-foreground" value="">{t('allClasses')}</option>
                         {classOptions.map((option, i) => (
-                            <option key={i} value={`${option.major_id}-${option.class_id}`}>
+                            <option className="dark:bg-zinc-800 dark:text-foreground" key={i} value={`${option.major_id}-${option.class_id}`}>
                                 {option.label}
                             </option>
                         ))}
@@ -286,7 +286,7 @@ export default function StudentsIndex({ students, classOptions, filters, search 
                                                 </DropdownMenuLabel>
                                                 <DropdownMenuItem>
                                                     <Link
-                                                        href="#"
+                                                        href={show(student.id)}
                                                         className="flex gap-4"
                                                     >
                                                         <Eye

@@ -85,7 +85,6 @@ export default function ItemsIndex({ items }: { items: Item[] }) {
     const [showAlert, setShowAlert] = useState(false);
     const [previewItem, setPreviewItem] = useState<Item | null>(null);
     const [search, setSearch] = useState('');
-    const [statusFilter, setStatusFilter] = useState<'all' | 'available' | 'inavailable'>('all');
 
     const allLocations = useMemo(() => {
         const map = new Map<string, Item[]>();
@@ -102,15 +101,12 @@ export default function ItemsIndex({ items }: { items: Item[] }) {
     const filteredItems = useMemo(() => {
         const locItems = allLocations.find(([name]) => name === selectedLocation)?.[1] ?? [];
         let result = locItems;
-        if (statusFilter !== 'all') {
-            result = result.filter((item) => item.status === statusFilter);
-        }
         const q = search.toLowerCase().trim();
         if (q) {
             result = result.filter((item) => item.name.toLowerCase().includes(q));
         }
         return result;
-    }, [allLocations, selectedLocation, search, statusFilter]);
+    }, [allLocations, selectedLocation, search]);
 
     const groupedByCategory = useMemo(() => {
         const groups = new Map<string, Item[]>();
@@ -121,9 +117,6 @@ export default function ItemsIndex({ items }: { items: Item[] }) {
         }
         return Array.from(groups.entries()).sort(([a], [b]) => a.localeCompare(b));
     }, [filteredItems]);
-
-    const availableCount = items.filter((i) => i.status === 'available').length;
-    const borrowedCount = items.filter((i) => i.status === 'inavailable').length;
 
     const handleDelete = () => {
         router.delete(destroy(deleteItemId));
@@ -155,18 +148,6 @@ export default function ItemsIndex({ items }: { items: Item[] }) {
                     </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value as 'all' | 'available' | 'inavailable')}
-                        className="rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm text-gray-900 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-gray-800 dark:bg-gray-900 dark:text-white"
-                    >
-                        <option value="all">{t('all')} ({items.length})</option>
-                        <option value="available">{t('available')} ({availableCount})</option>
-                        <option value="inavailable">{t('borrowed')} ({borrowedCount})</option>
-                    </select>
-                </div>
-
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
                     <input
@@ -185,7 +166,6 @@ export default function ItemsIndex({ items }: { items: Item[] }) {
                             onClick={() => {
                                 setSelectedLocation(name);
                                 setSearch('');
-                                setStatusFilter('all');
                             }}
                             className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
                                 selectedLocation === name

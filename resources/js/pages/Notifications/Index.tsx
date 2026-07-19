@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { Bell, CheckCheck, Clock } from 'lucide-react';
+import { Bell, CheckCheck, Clock, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/language-context';
@@ -62,6 +62,10 @@ export default function NotificationsIndex({ notifications }: { notifications: P
 
     const handleMarkAsRead = (id: string) => {
         router.post(`/notifications/${id}/mark-as-read`, {}, { preserveState: true });
+    };
+
+    const handleDelete = (id: string) => {
+        router.delete(`/notifications/${id}`, { preserveState: true });
     };
 
     const formatDate = (date: string) => {
@@ -128,11 +132,16 @@ export default function NotificationsIndex({ notifications }: { notifications: P
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        {!notification.read_at && (
-                                            <Button variant="ghost" size="sm" onClick={() => handleMarkAsRead(notification.id)}>
-                                                {t('markRead')}
+                                        <div className="flex items-center gap-1">
+                                            {!notification.read_at && (
+                                                <Button variant="ghost" size="sm" onClick={() => handleMarkAsRead(notification.id)}>
+                                                    {t('markRead')}
+                                                </Button>
+                                            )}
+                                            <Button variant="ghost" size="sm" onClick={() => handleDelete(notification.id)}>
+                                                <Trash2 className="h-4 w-4 text-red-500" />
                                             </Button>
-                                        )}
+                                        </div>
                                     </TableCell>
                                 </TableRow>
                             ))

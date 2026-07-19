@@ -58,6 +58,7 @@
                         <th>No</th>
                         <th>Nama Siswa</th>
                         <th>NIS</th>
+                        <th>No. HP</th>
                         <th>Kelas</th>
                         <th>Barang</th>
                         <th>Tanggal Pinjam</th>
@@ -70,6 +71,7 @@
                         <td>{{ $i + 1 }}</td>
                         <td>{{ $loan->student?->name ?? $loan->borrower_name }}</td>
                         <td>{{ $loan->student?->nis ?? '-' }}</td>
+                        <td>{{ $loan->student?->phone ?? '-' }}</td>
                         <td>{{ $section['classLevel'] }} {{ $section['major'] }}</td>
                         <td>{{ $loan->item->name }}</td>
                         <td>{{ \Carbon\Carbon::parse($loan->borrower_date)->format('d M Y') }}</td>

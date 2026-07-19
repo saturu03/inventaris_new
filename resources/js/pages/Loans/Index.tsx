@@ -17,6 +17,7 @@ import AppLayout from '@/layouts/app-layout';
 import { index, create, edit, destroy, pdf, returnMethod } from '@/routes/loans';
 import { useLanguage } from '@/contexts/language-context';
 import type { BreadcrumbItem, Loan } from '@/types';
+import { formatDateTime } from '@/lib/utils';
 
 function statusBadge(loan: Loan, t: (key: string, params?: Record<string, string | number>) => string) {
     if (loan.returned || !loan.estimated_return_date) return null;
@@ -183,11 +184,11 @@ export default function LoansIndex({
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <span>{t('borrowDate')}</span>
-                                                    <span className="font-medium text-card-foreground">{loan.borrower_date}</span>
+                                                    <span className="font-medium text-card-foreground">{formatDateTime(loan.borrower_date)}</span>
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <span>{t('estimatedReturn')}</span>
-                                                    <span className="font-medium text-card-foreground">{loan.estimated_return_date ?? '-'}</span>
+                                                    <span className="font-medium text-card-foreground">{formatDateTime(loan.estimated_return_date)}</span>
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <span>{t('duration')}</span>
@@ -195,7 +196,7 @@ export default function LoansIndex({
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <span>{t('returnedStatus')}</span>
-                                                    <span className="font-medium text-card-foreground">{loan.returned ?? '-'}</span>
+                                                    <span className="font-medium text-card-foreground">{formatDateTime(loan.returned)}</span>
                                                 </div>
                                                 <div className="flex justify-between">
                                                     <span>{t('receivedBy')}</span>
