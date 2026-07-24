@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { ArrowLeftRight, BookOpen, GraduationCap, Inbox, LayoutGrid, Mail, MapPin, Package, Phone, Shield, Tags, Trash2, Users } from 'lucide-react';
+import { ArrowLeftRight, BookOpen, CheckSquare, GraduationCap, Inbox, LayoutGrid, Layers, Mail, MapPin, Package, Phone, Shield, Tags, Trash2, Users } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 import { NavUser } from '@/components/nav-user';
 import {
@@ -83,6 +83,7 @@ export function AppSidebar() {
         { title: t('manageCategory'), href: categoriesIndex(), icon: Tags },
         { title: t('manageMajor'), href: majorsIndex(), icon: BookOpen },
         { title: t('manageLocation'), href: locationsIndex(), icon: MapPin },
+        { title: t('manageClassesTitle'), href: classlevelsIndex(), icon: Layers },
         ...staffMasterDataItems,
     ];
 
@@ -99,6 +100,7 @@ export function AppSidebar() {
     const adminItems: NavItem[] = [
         { title: t('manageUsers'), href: usersIndex(), icon: Shield },
         { title: t('homeroomTeachers'), href: homeroomTeachersIndex(), icon: Phone },
+        { title: 'Persetujuan Peminjaman', href: '/loans/approvals', icon: CheckSquare },
     ];
 
     return (

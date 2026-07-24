@@ -2,9 +2,9 @@ import { Transition } from '@headlessui/react';
 import { Head, useForm } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AppLayout from '@/layouts/app-layout';
 import { index, edit, update } from '@/routes/classlevels';
 import { useLanguage } from '@/contexts/language-context';
@@ -18,7 +18,7 @@ export default function ClasslevelEdit({ classlevel }: { classlevel: Classlevel 
     ];
 
     const { data, setData, put, errors, reset, processing, recentlySuccessful } =
-        useForm<ClasslevelForm>({ level: classlevel.level });
+        useForm<ClasslevelForm>({ level: String(classlevel.level) });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -32,26 +32,22 @@ export default function ClasslevelEdit({ classlevel }: { classlevel: Classlevel 
                 <h3 className="text-lg font-medium">{t('editClass')}</h3>
                 <Separator />
                 <form onSubmit={handleSubmit} method="post" className="space-y-6">
-                    <div className="space-y-2">
-                        <Label className="block text-sm font-medium">{t('level')}</Label>
-                        <Select
-                            value={data.level.toString()}
-                            onValueChange={(value) => setData('level', Number(value))}
-                        >
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder={t('selectLevel')} />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectLabel>{t('levels')}</SelectLabel>
-                                    <SelectItem value="10">{t('class10')}</SelectItem>
-                                    <SelectItem value="11">{t('class11')}</SelectItem>
-                                    <SelectItem value="12">{t('class12')}</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                        <InputError className="mt-2" message={errors.level} />
+                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="level" className="block text-sm font-medium">{t('level')}</Label>
+                            <Input
+                                type="text"
+                                name="level"
+                                id="level"
+                                required
+                                placeholder="contoh: 10"
+                                value={data.level}
+                                onChange={(e) => setData('level', e.target.value)}
+                            />
+                            <InputError className="mt-2" message={errors.level} />
+                        </div>
                     </div>
+
                     <div className="flex items-center gap-4">
                         <Button type="submit" disabled={processing}>{t('edit')}</Button>
                         <Transition show={recentlySuccessful} enter="transition ease-in-out" enterFrom="opacity-0" leave="transition ease-in-out" leaveTo="opacity-0">

@@ -482,6 +482,14 @@ export default function LoanCreate({
                         <p className="text-sm text-red-600">{(errors as Record<string, string>).items_unavailable}</p>
                     )}
 
+                    {data.entries.some((entry) =>
+                        entry.item_ids.some((itemId) => items.find((i) => i.id === itemId && i.is_limited))
+                    ) && (
+                        <div className="rounded-md border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-700 dark:bg-amber-950 dark:text-amber-200">
+                            Perhatian: Barang terbatas yang dipilih memerlukan persetujuan proktor terlebih dahulu sebelum peminjaman aktif.
+                        </div>
+                    )}
+
                     <div className="flex items-center gap-4">
                         <Button type="submit" disabled={processing}>
                             Add

@@ -25,7 +25,7 @@ class StudentFactory extends Factory
             'nis' => $this->faker->unique()->numerify('#####'), // untuk menghasilkan nis siswa secara acak dan unik
             'gender' => $this->faker->randomElement(['male', 'female']), // untuk menghasilkan jenis kelamin siswa secara acak
             'address' => $this->faker->address(), // untuk menghasilkan alamat siswa secara acak
-            'barcode' => $this->faker->uuid(), // untuk menghasilkan barcode siswa secara acak dan unik
+            'barcode' => $this->faker->bothify('########'), // untuk menghasilkan barcode siswa secara acak dan unik
             'phone' => $this->faker->phoneNumber(), // untuk menghasilkan nomor telephon siswa secara acak
         ];
     }

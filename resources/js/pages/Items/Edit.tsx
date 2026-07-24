@@ -2,6 +2,7 @@ import { Transition } from '@headlessui/react';
 import { Head, useForm } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -47,6 +48,7 @@ export default function ItemEdit({item, categories, locations}: {item: ItemForm 
         status: item.status,
         spec: item.spec,
         condition: item.condition,
+        is_limited: item.is_limited ?? false,
         photo: null,
     });
 
@@ -231,6 +233,17 @@ export default function ItemEdit({item, categories, locations}: {item: ItemForm 
                                 message={errors.condition}
                             />
                         </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        <Checkbox
+                            id="is_limited"
+                            checked={data.is_limited}
+                            onCheckedChange={(checked) => setData('is_limited', checked === true)}
+                        />
+                        <Label htmlFor="is_limited" className="text-sm font-medium">
+                            Barang Terbatas
+                        </Label>
                     </div>
 
                     <div className="space-y-2">

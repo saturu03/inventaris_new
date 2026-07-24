@@ -12,7 +12,6 @@ class ClassSeeder extends Seeder
      */
     public function run(): void
     {
-        // menambahkan kelas otomatis saat menjalankan seeder
         Classlevel::create(['level' => 10]);
         Classlevel::create(['level' => 11]);
         Classlevel::create(['level' => 12]);

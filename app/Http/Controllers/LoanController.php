@@ -150,8 +150,11 @@ class LoanController extends Controller
         $itemIds = [];
         $loans = [];
 
+        $limitedItemIds = Item::whereIn('id', $allItemIds)->where('is_limited', true)->pluck('id')->toArray();
+
         foreach ($request->entries as $entry) {
             foreach ($entry['item_ids'] as $itemId) {
+                $isLimited = in_array($itemId, $limitedItemIds);
                 $loans[] = [
                     'item_id' => $itemId,
                     'user_out_id' => $request->user()->id,
@@ -161,6 +164,7 @@ class LoanController extends Controller
                     'collateral_type' => $request->collateral_type,
                     'borrower_date' => $request->borrower_date,
                     'estimated_return_date' => $estimatedReturn->format('Y-m-d H:i:s'),
+                    'approval_status' => $isLimited ? 'pending' : 'none',
                     'created_at' => $now,
                     'updated_at' => $now,
                 ];
@@ -170,9 +174,15 @@ class LoanController extends Controller
 
         Loan::insert($loans);
 
-        Item::whereIn('id', $itemIds)->where('status', 'available')->update(['status' => 'inavailable']);
+        $nonLimitedIds = array_diff($itemIds, $limitedItemIds);
+        Item::whereIn('id', $nonLimitedIds)->where('status', 'available')->update(['status' => 'inavailable']);
 
-        return redirect()->route('loans.index')->with('success', 'Loan(s) created successfully.');
+        $message = 'Loan(s) created successfully.';
+        if (! empty($limitedItemIds)) {
+            $message = 'Loan(s) created. Limited items are pending approval.';
+        }
+
+        return redirect()->route('loans.index')->with('success', $message);
     }
 
     public function edit(Loan $loan)

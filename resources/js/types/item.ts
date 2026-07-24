@@ -20,6 +20,7 @@ export type Item = {
     status: 'available' | 'inavailable';
     spec: string | null;
     condition: 'functional' | 'slightly_damaged' | 'broken';
+    is_limited: boolean;
     barcode: string;
     photo: string | null;
     category: { name: string };
@@ -33,5 +34,6 @@ export type ItemForm = {
     status: string;
     spec: string;
     condition: string;
+    is_limited: boolean;
     photo: string | File | null;
 };

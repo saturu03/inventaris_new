@@ -26,7 +26,7 @@ class MajorController extends Controller
     {
         $request->validate([
             'full_name' => 'required|string|max:255',
-            'alias' => 'required|string|max:4',
+            'alias' => 'required|string|max:6',
         ]);
 
         Major::create([
@@ -48,7 +48,7 @@ class MajorController extends Controller
     {
         $request->validate([
             'full_name' => 'required|string|max:255',
-            'alias' => 'required|string|max:4',
+            'alias' => 'required|string|max:6',
         ]);
 
         $major->update([

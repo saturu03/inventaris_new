@@ -18,6 +18,7 @@ class Item extends Model
         'status',
         'spec',
         'condition',
+        'is_limited',
         'barcode',
         'photo',
     ];  // untuk mengizinkan field mana saja yang boleh di isi

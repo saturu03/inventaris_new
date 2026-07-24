@@ -66,7 +66,7 @@ export default function ClasslevelsIndex({ classes }: { classes: Classlevel[] })
                     <TableHeader>
                         <TableRow>
                             <TableHead>#</TableHead>
-                            <TableHead>{t('level')}</TableHead>
+                            <TableHead>{t('classLabel')}</TableHead>
                             <TableHead className="text-right">Action</TableHead>
                         </TableRow>
                     </TableHeader>
@@ -74,7 +74,7 @@ export default function ClasslevelsIndex({ classes }: { classes: Classlevel[] })
                         {classes.map((cls, index) => (
                             <TableRow key={cls.id}>
                                 <TableCell>{index + 1}</TableCell>
-                                <TableCell>Class {cls.level}</TableCell>
+                                <TableCell>{cls.level}</TableCell>
                                 <TableCell className="text-right">
                                     <DropdownMenu>
                                         <DropdownMenuTrigger asChild>
@@ -94,7 +94,7 @@ export default function ClasslevelsIndex({ classes }: { classes: Classlevel[] })
                                             <DropdownMenuGroup>
                                                 <DropdownMenuItem variant="destructive" onSelect={() => {
                                                     setDeleteId(cls.id);
-                                                    setDeleteName('Class ' + cls.level);
+                                                    setDeleteName(cls.level);
                                                     setShowAlert(true);
                                                 }}>
                                                      <Trash2 className="my-auto" size={16} /> {t('delete')}

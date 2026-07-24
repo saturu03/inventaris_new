@@ -40,7 +40,7 @@ export default function MajorEdit({ major }: { major: Major }) {
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="alias" className="block text-sm font-medium">{t('alias')}</Label>
-                            <Input type="text" id="alias" required maxLength={4} value={data.alias} onChange={(e) => setData('alias', e.target.value)} />
+                            <Input type="text" id="alias" required maxLength={5} value={data.alias} onChange={(e) => setData('alias', e.target.value)} />
                             <InputError className="mt-2" message={errors.alias} />
                         </div>
                     </div>

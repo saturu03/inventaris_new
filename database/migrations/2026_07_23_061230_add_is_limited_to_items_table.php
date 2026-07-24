@@ -11,18 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('classes', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedTinyInteger('level');
-            $table->timestamps();
+        Schema::table('items', function (Blueprint $table) {
+            $table->boolean('is_limited')->default(false)->after('condition');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('classes');
+        Schema::table('items', function (Blueprint $table) {
+            $table->dropColumn('is_limited');
+        });
     }
 };

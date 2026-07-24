@@ -36,5 +36,5 @@ export type Major = {
 
 export type Class = {
     id: number;
-    level: number;
+    level: string;
 };

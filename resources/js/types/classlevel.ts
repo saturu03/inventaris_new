@@ -1,8 +1,8 @@
 export type Classlevel = {
     id: number;
-    level: number;
+    level: string;
 };
 
 export type ClasslevelForm = {
-    level: number;
+    level: string;
 };

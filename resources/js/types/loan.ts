@@ -10,10 +10,15 @@ export type Loan = {
     borrower_date: string;
     estimated_return_date: string | null;
     returned: string | null;
+    approval_status: 'none' | 'pending' | 'approved' | 'rejected';
+    approval_note: string | null;
+    approved_by: number | null;
+    approved_at: string | null;
     item: {
         id: number;
         name: string;
         barcode: string;
+        is_limited?: boolean;
     };
     student: {
         id: number;
@@ -25,6 +30,10 @@ export type Loan = {
         name: string;
     };
     user_in: {
+        id: number;
+        name: string;
+    } | null;
+    approved_by_user?: {
         id: number;
         name: string;
     } | null;

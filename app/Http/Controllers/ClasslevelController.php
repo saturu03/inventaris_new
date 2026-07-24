@@ -25,7 +25,7 @@ class ClasslevelController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'level' => 'required|in:10,11,12',
+            'level' => 'required|string|max:5',
         ]);
 
         Classlevel::create([
@@ -45,7 +45,7 @@ class ClasslevelController extends Controller
     public function update(Request $request, Classlevel $classlevel)
     {
         $request->validate([
-            'level' => 'required|in:10,11,12',
+            'level' => 'required|string|max:5',
         ]);
 
         $classlevel->update([

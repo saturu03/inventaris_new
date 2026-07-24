@@ -22,6 +22,10 @@ class Loan extends Model
         'borrower_date',
         'estimated_return_date',
         'returned',
+        'approval_status',
+        'approval_note',
+        'approved_by',
+        'approved_at',
     ];
 
     protected function casts(): array
@@ -30,7 +34,13 @@ class Loan extends Model
             'borrower_date' => 'datetime',
             'estimated_return_date' => 'datetime',
             'returned' => 'datetime',
+            'approved_at' => 'datetime',
         ];
+    }
+
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     public function item(): BelongsTo

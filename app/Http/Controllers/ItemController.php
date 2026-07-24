@@ -54,6 +54,7 @@ class ItemController extends Controller
             'status' => 'required|in:available,inavailable',
             'spec' => 'nullable|string',
             'condition' => 'required|in:functional,slightly_damaged,broken',
+            'is_limited' => 'boolean',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -66,6 +67,7 @@ class ItemController extends Controller
             'status' => $request->status,
             'spec' => $request->spec,
             'condition' => $request->condition,
+            'is_limited' => $request->boolean('is_limited'),
             'barcode' => Str::uuid(),
             'photo' => $photoPath,
         ]);
@@ -108,6 +110,7 @@ class ItemController extends Controller
             'status' => 'required|in:available,inavailable',
             'spec' => 'nullable|string',
             'condition' => 'required|in:functional,slightly_damaged,broken',
+            'is_limited' => 'boolean',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -118,6 +121,7 @@ class ItemController extends Controller
             'status' => $request->status,
             'spec' => $request->spec,
             'condition' => $request->condition,
+            'is_limited' => $request->boolean('is_limited'),
         ];
 
         if ($request->hasFile('photo')) {

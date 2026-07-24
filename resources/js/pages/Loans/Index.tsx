@@ -20,6 +20,13 @@ import type { BreadcrumbItem, Loan } from '@/types';
 import { formatDateTime } from '@/lib/utils';
 
 function statusBadge(loan: Loan, t: (key: string, params?: Record<string, string | number>) => string) {
+    if (loan.approval_status === 'pending') {
+        return <Badge variant="outline" className="border-amber-400 text-amber-700 dark:border-amber-500 dark:text-amber-300">Menunggu Persetujuan</Badge>;
+    }
+    if (loan.approval_status === 'rejected') {
+        return <Badge variant="destructive">Ditolak</Badge>;
+    }
+
     if (loan.returned || !loan.estimated_return_date) return null;
 
     const now = new Date();
@@ -202,6 +209,18 @@ export default function LoansIndex({
                                                     <span>{t('receivedBy')}</span>
                                                     <span className="font-medium text-card-foreground">{loan.user_in?.name ?? '-'}</span>
                                                 </div>
+                                                {loan.approval_status === 'approved' && loan.approved_by_user && (
+                                                    <div className="flex justify-between">
+                                                        <span>Disetujui oleh</span>
+                                                        <span className="font-medium text-card-foreground">{loan.approved_by_user.name}</span>
+                                                    </div>
+                                                )}
+                                                {loan.approval_status === 'rejected' && loan.approval_note && (
+                                                    <div className="flex justify-between">
+                                                        <span>Alasan penolakan</span>
+                                                        <span className="font-medium text-red-600">{loan.approval_note}</span>
+                                                    </div>
+                                                )}
                                             </div>
 
                                             <div className="flex gap-2 border-t pt-3">

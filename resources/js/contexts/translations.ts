@@ -172,11 +172,6 @@ export const translations = {
     addClass: { en: 'Add class', id: 'Tambah kelas' },
     addClassTitle: { en: 'Add a new Class', id: 'Tambah Kelas Baru' },
     editClass: { en: 'Edit Class', id: 'Ubah Kelas' },
-    selectLevel: { en: 'Select level', id: 'Pilih tingkat' },
-    levels: { en: 'Levels', id: 'Tingkat' },
-    class10: { en: 'Class 10', id: 'Kelas 10' },
-    class11: { en: 'Class 11', id: 'Kelas 11' },
-    class12: { en: 'Class 12', id: 'Kelas 12' },
 
     // Loans
     manageLoansTitle: { en: 'Manage Loans', id: 'Kelola Peminjaman' },

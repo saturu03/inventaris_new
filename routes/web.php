@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ApprovalController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ClasslevelController;
 use App\Http\Controllers\DashboardController;
@@ -90,6 +91,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/homeroom-teachers/{homeroomTeacher:id}/edit', [HomeroomTeacherController::class, 'edit'])->name('homeroom-teachers.edit');
         Route::put('/homeroom-teachers/{homeroomTeacher:id}/', [HomeroomTeacherController::class, 'update'])->name('homeroom-teachers.update');
         Route::delete('/homeroom-teachers/{homeroomTeacher:id}/', [HomeroomTeacherController::class, 'destroy'])->name('homeroom-teachers.destroy');
+
+        // Route untuk persetujuan peminjaman barang terbatas
+        Route::get('/loans/approvals', [ApprovalController::class, 'index'])->name('approvals.index');
+        Route::put('/loans/{loan:id}/approve', [ApprovalController::class, 'approve'])->name('approvals.approve');
+        Route::put('/loans/{loan:id}/reject', [ApprovalController::class, 'reject'])->name('approvals.reject');
     });
 
     // Route untuk mengelola barang

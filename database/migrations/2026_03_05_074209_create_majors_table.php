@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('majors', function (Blueprint $table) {
             $table->id();
             $table->string('full_name'); // field name untuk nama lengkap jurusan
-            $table->string('alias', 4); // field name untuk nama singkatan jurusan
+            $table->string('alias', 10); // field name untuk nama singkatan jurusan
             $table->timestamps();
         });
     }
